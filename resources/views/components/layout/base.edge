@@ -16,9 +16,9 @@
     <nav class="flex flex-col px-4 py-2 gap-2">
       <div class="flex items-center justify-between gap-4 whitespace-nowrap">
         @if(simplifiedNavigation === undefined || !simplifiedNavigation)
-        <a href="{{ route('home') }}" class="flex items-center gap-1">
+        <a href="{{ route('home') }}" class="flex items-center gap-1 hover:text-gray-400">
           @svg('tabler:ghost-3-filled', { class: 'size-6' })
-          <span class="font-bold">Boo!</span>
+          <span class="font-bold text-xl">Boo!</span>
         </a>
         <div class="w-full max-sm:hidden">
           @!ui.packageSearch()
@@ -59,9 +59,9 @@
       @end
     </nav>
 
-    <div class="flex-1 px-4">
+    <main class="flex-1 px-4">
       {{{ await $slots.main() }}}
-    </div>
+    </main>
 
     <footer>
       <p class="text-center text-gray-400 px-4 py-2">

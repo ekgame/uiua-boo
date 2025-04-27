@@ -1,5 +1,14 @@
 @layout.base({ simplifiedNavigation: true })
-  @slot('main')
-    <h1>Hello world</h1>
-  @endslot
+@slot('main')
+<div class="flex flex-col items-center justify-center my-8 max-w-lg mx-auto">
+  <h1 class="flex items-center gap-2 text-4xl font-bold text-gray-200">
+    @svg('tabler:ghost-3-filled', { class: 'size-12' })
+    Boo!
+  </h1>
+  <p class="mb-6">
+    Uiua package registry
+  </p>
+  @!ui.packageSearch({ variant: 'large' })
+</div>
+@endslot
 @end
