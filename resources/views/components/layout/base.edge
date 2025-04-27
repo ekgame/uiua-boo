@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title || "Boo! - Uiua Package Registry" }}</title>
+  <link rel="preconnect" href="https://fonts.bunny.net" />
+
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+  @stack('dumper')
+</head>
+
+<body class="min-h-screen w-screen bg-gray-700 text-gray-200">
+  <div class="min-h-screen w-5xl max-w-screen mx-auto flex flex-col">
+    <nav class="flex justify-between p-2 gap-4">
+      <a href="{{ route("home") }}" class="flex items-center gap-1">
+        @svg('tabler:ghost-3-filled', { class: 'size-6' })
+        <span class="font-bold">Boo!</span>
+      </a>
+
+      <div clas="flex gap-2">
+        <a href="#" class="text-gray-200 hover:text-gray-400">
+          Browse Packages
+        </a>
+
+        <span class="text-gray-400">&middot;</span>
+
+        <a href="#" class="text-gray-200 hover:text-gray-400">
+          Docs
+        </a>
+
+        <span class="text-gray-400">&middot;</span>
+
+        @if(auth.user)
+        <a href="#" class="text-gray-200 hover:text-gray-400">
+          {{ auth.user?.githubName || 'Guest' }}
+        </a>
+        @else
+        <a href="{{ route('auth.login') }}" class="text-gray-200 hover:text-gray-400">
+          Login
+        </a>
+        @end
+      </div>
+    </nav>
+
+    <div class="flex-1 px-2">
+      {{{ await $slots.main() }}}
+    </div>
+
+    <footer>
+      <p class="text-center text-gray-400 p-2">
+        Boo!
+      </p>
+    </footer>
+  </div>
+</body>
+
+</html>

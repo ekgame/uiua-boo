@@ -1,0 +1,11 @@
+@import url(https://fonts.bunny.net/css?family=exo-2:400,400i,500,500i,600,600i,700,700i);
+
+@import "tailwindcss";
+@source "../views";
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  font-family: 'Exo 2', sans-serif;
+}
