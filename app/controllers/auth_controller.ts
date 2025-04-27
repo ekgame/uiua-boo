@@ -32,11 +32,12 @@ export default class AuthController {
     }, {
       githubId: githubUser.id,
       githubName: githubUser.name,
+      githubUsername: githubUser.original.login,
       email: githubUser.email,
     });
 
     await auth.use('web').login(user);
-    logger.info('User logged in: %s (%s)', user.githubName, user.email);
+    logger.info('User logged in: %s (%s)', user.githubUsername, user.email);
 
     return response.redirect().toRoute('home');
   }

@@ -6,6 +6,7 @@ export default class extends BaseSchema {
       table.increments('id').notNullable()
       table.integer('github_id').notNullable()
       table.string('github_name', 256).notNullable()
+      table.string('github_username', 256).notNullable()
       table.string('email', 256).notNullable()
 
       table.timestamp('created_at').notNullable()

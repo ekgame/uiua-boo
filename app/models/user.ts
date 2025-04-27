@@ -14,6 +14,9 @@ export default class User extends BaseModel {
   declare githubName: string;
 
   @column()
+  declare githubUsername: string;
+
+  @column()
   declare email: string;
 
   @column.dateTime({ autoCreate: true })
