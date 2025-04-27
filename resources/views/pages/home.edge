@@ -1,6 +1,6 @@
 @layout.base({ simplifiedNavigation: true })
 @slot('main')
-<div class="flex flex-col items-center justify-center my-8 max-w-lg mx-auto">
+<div class="flex flex-col items-center justify-center mt-20 max-w-lg mx-auto">
   <h1 class="flex items-center gap-2 text-4xl font-bold text-gray-200">
     @svg('tabler:ghost-3-filled', { class: 'size-12' })
     Boo!
@@ -8,7 +8,20 @@
   <p class="mb-6">
     Uiua package registry
   </p>
+
   @!ui.packageSearch({ variant: 'large' })
+
+  @ui.button({
+    type: 'link',
+    variant: 'primary',
+    class: ['mt-12'],
+    href: '#',
+  })
+    <span class="flex items-center gap-2">
+      @svg('tabler:plus', { class: 'size-6' })
+      Publish a package
+    </span>
+  @end
 </div>
 @endslot
 @end

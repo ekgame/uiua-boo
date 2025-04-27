@@ -1,0 +1,47 @@
+@let(tag = type === 'link' ? 'a' : (type || 'button'))
+
+@let(variantName = variant || 'default')
+@let(variantClasses = {
+  default: [
+    'text-gray-200',
+    'bg-gray-600',
+    'border-gray-200',
+    'hover:bg-gray-500',
+    'active:bg-gray-600',
+  ],
+  primary: [
+    'text-purple-200',
+    'bg-purple-600',
+    'border-purple-300',
+    'hover:bg-purple-500',
+    'active:bg-purple-700',
+  ],
+})
+
+<{{ tag }} {{
+  $props.merge({
+    class: [
+      'group',
+      'relative',
+      'inline-flex',
+      'items-center',
+      'justify-center',
+      'overflow-hidden',
+      'rounded-md',
+      'border',
+      'px-6 py-3',
+      'font-medium',
+      'transition-all',
+      'duration-100',
+      'active:translate-x-[3px]',
+      'active:translate-y-[3px]',
+      'button-shadow',
+      'cursor-pointer',
+      ...(variantClasses[variantName] || variantClasses.default),
+    ],
+  })
+  .except(['type', 'variant'])
+  .toAttrs() 
+}}>
+  {{{ await $slots.main() }}}
+</{{ tag }}>
