@@ -1,0 +1,10 @@
+<form
+  class="flex w-full bg-gray-800 rounded-md overflow-hidden"
+  action="{{ route('browse.packages') }}"
+  method="GET"
+>
+  <input type="text" name="search" class="w-full outline-none text-gray-200 pl-2 py-1" placeholder="Search for packages..." />
+  <button type="submit" class="text-gray-200 px-2 cursor-pointer hover:bg-gray-900">
+    @svg('tabler:search', { class: 'size-4' })
+  </button>
+</form>

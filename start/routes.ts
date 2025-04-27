@@ -10,7 +10,8 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js';
 
-router.on('/').render('pages/home').as('home');
+router.get('/', '#controllers/browse_controller.home').as('home');
+router.get('/packages', '#controllers/browse_controller.packages').as('browse.packages');
 
 router.get('/login/github', '#controllers/auth_controller.login').as('auth.login').use(middleware.guest());
 router.get('/login/github/callback', '#controllers/auth_controller.callback').as('auth.login.callback');
