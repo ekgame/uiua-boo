@@ -1,0 +1,2 @@
+- [ ] Test error pages
+- [ ] Test if oauth errors display an error page

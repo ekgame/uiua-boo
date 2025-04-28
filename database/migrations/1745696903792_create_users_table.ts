@@ -8,6 +8,7 @@ export default class extends BaseSchema {
       table.string('github_name', 256).notNullable()
       table.string('github_username', 256).notNullable()
       table.string('email', 256).notNullable()
+      table.enum('role', ['ADMIN', 'USER']).notNullable()
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()

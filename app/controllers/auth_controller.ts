@@ -1,5 +1,6 @@
-import User from '#models/user';
-import type { HttpContext } from '@adonisjs/core/http'
+import { inject } from '@adonisjs/core';
+import type { HttpContext } from '@adonisjs/core/http';
+import UserService from '#services/user_service';
 
 export default class AuthController {
 
@@ -11,6 +12,7 @@ export default class AuthController {
       });
   }
 
+  @inject()
   async callback({ ally, response, auth, logger }: HttpContext) {
     const github = ally.use('github');
 
@@ -27,9 +29,7 @@ export default class AuthController {
     }
 
     const githubUser = await github.user();
-    const user = await User.updateOrCreate({
-      githubId: githubUser.id,
-    }, {
+    const user = await UserService.createOrUpdateUser({
       githubId: githubUser.id,
       githubName: githubUser.name,
       githubUsername: githubUser.original.login,
@@ -37,7 +37,7 @@ export default class AuthController {
     });
 
     await auth.use('web').login(user);
-    logger.info('User logged in: %s (%s)', user.githubUsername, user.email);
+    logger.info('User logged in: %s', user.githubUsername);
 
     return response.redirect().toRoute('home');
   }
