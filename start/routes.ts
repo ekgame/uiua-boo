@@ -16,3 +16,5 @@ router.get('/packages', '#controllers/browse_controller.packages').as('browse.pa
 router.get('/login/github', '#controllers/auth_controller.login').as('auth.login').use(middleware.guest());
 router.get('/login/github/callback', '#controllers/auth_controller.callback').as('auth.login.callback');
 router.get('/logout', '#controllers/auth_controller.logout').as('auth.logout').use(middleware.auth());
+
+router.get('/publish', '#controllers/publish_controller.view').as('package.publish');

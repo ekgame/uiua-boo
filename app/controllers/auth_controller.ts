@@ -1,10 +1,19 @@
-import { inject } from '@adonisjs/core';
 import type { HttpContext } from '@adonisjs/core/http';
 import UserService from '#services/user_service';
+import router from '@adonisjs/core/services/router';
+
+const RETURN_ROUTE_NAME_PARAM = 'return_to_route_name';
 
 export default class AuthController {
+  async login({ ally, request, session }: HttpContext) {
+    const backRouteName = request.input('back', null);
 
-  async login({ ally }: HttpContext) {
+    if (backRouteName && router.has(backRouteName)) {
+      session.put(RETURN_ROUTE_NAME_PARAM, request.input('back'));
+    } else {
+      session.forget(RETURN_ROUTE_NAME_PARAM);
+    }
+
     return ally
       .use('github')
       .redirect((request) => {
@@ -12,8 +21,7 @@ export default class AuthController {
       });
   }
 
-  @inject()
-  async callback({ ally, response, auth, logger }: HttpContext) {
+  async callback({ ally, response, auth, logger, session }: HttpContext) {
     const github = ally.use('github');
 
     if (github.accessDenied()) {
@@ -39,7 +47,9 @@ export default class AuthController {
     await auth.use('web').login(user);
     logger.info('User logged in: %s', user.githubUsername);
 
-    return response.redirect().toRoute('home');
+    const returnToRouteName = session.get(RETURN_ROUTE_NAME_PARAM) || 'home';
+    logger.debug('Redirecting logged in user to %s', returnToRouteName);
+    return response.redirect().toRoute(returnToRouteName);
   }
 
   async logout({ auth, response }: HttpContext) {
