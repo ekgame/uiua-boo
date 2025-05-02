@@ -1,0 +1,41 @@
+<div class="flex flex-col gap-2">
+  <h2 class="flex text-xl font-bold text-gray-200">Create a new scope</h2>
+
+  <p>
+    Scope is a group of packages managed by a single user or multiple members.
+    A scope may be named after:
+    <ul class="list-disc list-inside">
+      <li>Your username - for miscelanious packages.</li>
+      <li>Brand name - for groups or organizations.</li>
+      <li>Name of a project - for projects with multiple packages.</li>
+    </ul>
+  </p>
+
+  <form method="POST" action="{{ route('package.publish.submit') }}">
+    <input type="hidden" name="action" value="create-scope" />
+    {{ csrfField() }}
+
+    @ui.input({
+      type: 'text',
+      name: 'new_scope',
+      error_field: 'new_scope',
+      placeholder: 'scope',
+      value: old('new_scope'),
+    })
+      @slot('prefix')
+        @svg('tabler:at', { class: 'size-4 text-gray-400' })
+      @endslot
+    @end
+
+    <p>
+      @ui.button({
+        submit: true,
+        variant: 'primary',
+        class: ['mt-2 flex items-center gap-2'],
+      })
+        @svg('tabler:plus', { class: 'size-6' })
+        Create a scope
+      @end
+    </p>
+  </form>
+</div>

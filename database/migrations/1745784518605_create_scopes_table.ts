@@ -11,8 +11,8 @@ export default class extends BaseSchema {
     });
 
     this.schema.createTable('scope_member', (table) => {
-      table.integer('scope_id').references('id').inTable('scope');
-      table.integer('user_id').references('id').inTable('user');
+      table.integer('scope_id').references('id').inTable('scope').onDelete('CASCADE');
+      table.integer('user_id').references('id').inTable('user').onDelete('CASCADE');
       table.enum('member_type', ['OWNER', 'ADMIN', 'MEMBER']).notNullable();
   
       table.timestamp('created_at');

@@ -1,0 +1,15 @@
+<div class="flex flex-col gap-4">
+  <p>You must be logged in to publish a package.</p>
+
+  <p>
+    @ui.button({
+      type: 'link',
+      variant: 'primary',
+      href: route('auth.login', {}, { qs: { back: 'package.publish' }}),
+      class: 'flex items-center gap-2',
+    })
+      @svg('tabler:brand-github', { class: 'size-6' })
+      Log in with GitHub
+    @end
+  </p>
+</div>

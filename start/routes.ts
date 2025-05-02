@@ -18,3 +18,4 @@ router.get('/login/github/callback', '#controllers/auth_controller.callback').as
 router.get('/logout', '#controllers/auth_controller.logout').as('auth.logout').use(middleware.auth());
 
 router.get('/publish', '#controllers/publish_controller.view').as('package.publish');
+router.post('/publish', '#controllers/publish_controller.submit').as('package.publish.submit').use(middleware.auth());

@@ -1,0 +1,39 @@
+<div class="flex flex-col gap-2">
+  <h2 class="flex text-xl font-bold text-gray-200">Select a scope</h2>
+
+  <p>
+    Select a scope for your package.
+  </p>
+
+  <form method="POST" action="{{ route('package.publish.submit') }}">
+    <input type="hidden" name="action" value="select-scope" />
+    {{ csrfField() }}
+
+    @ui.select({
+      name: 'selected_scope',
+      id: 'selected_scope',
+      error_field: 'selected_scope',
+      label: 'Scope',
+      placeholder: 'Select a scope',
+    })
+      <option value="" {{ old('selected_scope') === null ? 'selected' : '' }} class="italic">
+        - Select a scope -
+      </option>
+      @each(scope in availableScopes)
+        <option value="{{ scope.name }}" {{ scope.name === old('selected_scope') ? 'selected' : '' }}>
+          {{ '@' + scope.name }}
+        </option>
+      @endeach
+    @end
+
+    <p>
+      @ui.button({
+        submit: true,
+        variant: 'primary',
+        class: ['mt-2 flex items-center gap-2'],
+      })
+        Use scope
+      @end
+    </p>
+  </form>
+</div>

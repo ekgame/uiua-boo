@@ -1,0 +1,40 @@
+@let(slot_prefix = $slots.prefix ? await $slots.prefix() : '')
+@let(slot_suffix = $slots.suffix ? await $slots.suffix() : '')
+@let(errors = flashMessages.get('inputErrorsBag.' + $props.get('error_field')))
+
+<div class="flex flex-col rounded-md overflow-hidden">
+  <div class="flex bg-gray-800 overflow-hidden">
+    @if(slot_prefix)
+      <div class="flex items-center pl-2">
+        {{{ slot_prefix }}}
+      </div>
+    @endif
+
+    <select {{
+      $props.merge({
+        class: [
+          'w-full outline-none text-gray-200 px-2 py-2 flex-1',
+        ],
+      })
+      .toAttrs() 
+    }}>
+      {{{ await $slots.main() }}}
+    </select>
+
+    @if(slot_suffix)
+      <div class="flex items-center pr-2">
+        {{{ slot_suffix }}}
+      </div>
+    @endif
+  </div>
+
+  @if(errors)
+    <div class="input-error bg-red-900 px-2 py-1">
+      <ul>
+        @each(error in errors)
+          <li class="text-red-200">{{ error }}</li>
+        @end
+      </ul>
+    </div>
+  @end
+</div>

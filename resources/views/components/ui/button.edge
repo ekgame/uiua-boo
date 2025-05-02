@@ -1,4 +1,4 @@
-@let(tag = type === 'link' ? 'a' : (type || 'button'))
+@let(tag = type === 'link' ? 'a' : 'button')
 
 @let(variantName = variant || 'default')
 @let(variantClasses = {
@@ -18,30 +18,36 @@
   ],
 })
 
-<{{ tag }} {{
-  $props.merge({
-    class: [
-      'group',
-      'relative',
-      'inline-flex',
-      'items-center',
-      'justify-center',
-      'overflow-hidden',
-      'rounded-md',
-      'border',
-      'px-6 py-3',
-      'font-medium',
-      'transition-all',
-      'duration-100',
-      'active:translate-x-[3px]',
-      'active:translate-y-[3px]',
-      'button-shadow',
-      'cursor-pointer',
-      ...(variantClasses[variantName] || variantClasses.default),
-    ],
-  })
-  .except(['type', 'variant'])
-  .toAttrs() 
-}}>
+<{{ tag }}
+  @if(submit)
+    type="submit"
+  @end
+
+  {{
+    $props.merge({
+      class: [
+        'group',
+        'relative',
+        'inline-flex',
+        'items-center',
+        'justify-center',
+        'overflow-hidden',
+        'rounded-md',
+        'border',
+        'px-6 py-3',
+        'font-medium',
+        'transition-all',
+        'duration-100',
+        'active:translate-x-[3px]',
+        'active:translate-y-[3px]',
+        'button-shadow',
+        'cursor-pointer',
+        ...(variantClasses[variantName] || variantClasses.default),
+      ],
+    })
+    .except(['type', 'variant', 'submit'])
+    .toAttrs() 
+  }}
+>
   {{{ await $slots.main() }}}
 </{{ tag }}>
