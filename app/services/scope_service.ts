@@ -5,6 +5,17 @@ import logger from "@adonisjs/core/services/logger";
 import db from '@adonisjs/lucid/services/db';
 
 class ScopeService {
+  async getMemberRole(user: User, scope: Scope): Promise<string|null> {
+    const result = await db.query()
+      .select('scope_member.member_type')
+      .from('scope_member')
+      .where('scope_member.scope_id', scope.id)
+      .where('scope_member.user_id', user.id)
+      .first();
+    
+    return result?.member_type || null;
+  }
+
   async createScope(user: User, name: string): Promise<Scope> {
     const validatedData = await createScopeValidator.validate({
       new_scope: name,

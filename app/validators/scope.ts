@@ -1,6 +1,7 @@
 import Scope from '#models/scope';
 import User from '#models/user';
-import db from '@adonisjs/lucid/services/db';
+import ScopePolicy from '#policies/scope_policy';
+import { Bouncer } from '@adonisjs/bouncer';
 import vine, { SimpleMessagesProvider } from '@vinejs/vine';
 import { FieldContext } from '@vinejs/vine/types';
 
@@ -36,17 +37,16 @@ async function canUseScope(
   }
 
   const user = field.meta.user as User;
+  if (!user) {
+    field.report('User is not authenticated', 'auth', field);
+    return;
+  }
+
   const scope = await Scope.findByOrFail('name', value);
-  const isAdmin = await db.query()
-    .select(1)
-    .from('scope_member')
-    .where('scope_member.scope_id', scope.id)
-    .where('scope_member.user_id', user.id)
-    .where('scope_member.member_type', 'IN', ['ADMIN', 'OWNER'])
-    .first();
+  const bouncer = new Bouncer(user);
     
-  if (!isAdmin) {
-    field.report('You are not allowed to use this scope', 'use.scope', field);
+  if (await bouncer.with(ScopePolicy).denies('use', scope)) {
+    field.report('You are not allowed to use this scope', 'use', field);
   }
 }
 
@@ -57,17 +57,16 @@ export const selectScopeValidator = vine
     user: User,
   }>()
   .compile(
-    vine
-      .object({
-        selected_scope: vine.string()
-          .exists({table: 'scope', column: 'name'})
-          .use(canUseScopeRule())
-          .transform(async (value) => await Scope.findByOrFail('name', value)),
-      })
+    vine.object({
+      selected_scope: vine.string()
+        .exists({table: 'scope', column: 'name'})
+        .use(canUseScopeRule())
+        .transform(async (value) => await Scope.findByOrFail('name', value)),
+    })
   );
 
 selectScopeValidator.messagesProvider = new SimpleMessagesProvider({
   'selected_scope.required': 'You must select a scope',
   'selected_scope.database.exists': 'Scope does not exist',
-  'selected_scope.use.scope': 'You are not allowed to use this scope',
+  'selected_scope.use': 'You are not allowed to use this scope',
 });
