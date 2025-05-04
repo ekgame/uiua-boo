@@ -1,2 +1,6 @@
 - [ ] Test error pages
 - [ ] Test if oauth errors display an error page
+- [ ] Add an alert in the next page when scope was created
+- [ ] Add limit to how many scopes you can create
+- [ ] Add a limit to how many packages you can create
+- [ ] Add a limit to how many versions can be published
