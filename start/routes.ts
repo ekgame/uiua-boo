@@ -17,5 +17,7 @@ router.get('/login/github', '#controllers/auth_controller.login').as('auth.login
 router.get('/login/github/callback', '#controllers/auth_controller.callback').as('auth.login.callback');
 router.get('/logout', '#controllers/auth_controller.logout').as('auth.logout').use(middleware.auth());
 
-router.get('/publish', '#controllers/publish_controller.view').as('package.publish');
-router.post('/publish', '#controllers/publish_controller.submit').as('package.publish.submit').use(middleware.auth());
+router.get('/publish', '#controllers/publish_controller.scopeForm').as('package.publish');
+router.post('/publish', '#controllers/publish_controller.submitScope').as('package.publish.submit_scope').use(middleware.auth());
+router.get('/publish/:scope', '#controllers/publish_controller.packageForm').as('package.publish.package_form').use(middleware.auth());
+router.post('/publish/:scope', '#controllers/publish_controller.submitPackage').as('package.publish.submit_package').use(middleware.auth());

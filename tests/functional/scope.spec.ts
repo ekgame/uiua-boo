@@ -86,15 +86,15 @@ test.group('scope', (group) => {
   test('select scope for new package', async ({ assert }) => {
     const scope = await ScopeService.createScope(user1, 'test-scope');
 
-    const validatedScope = await ScopeService.validateSelectScope(user1, scope.name);
+    const validatedScope = await ScopeService.validateSelectedScope(user1, scope.name);
     assert.equal(validatedScope.name, scope.name, 'Should validate the selected scope for the user');
 
     await assert.rejects(() => {
-      return ScopeService.validateSelectScope(user2, scope.name);
+      return ScopeService.validateSelectedScope(user2, scope.name);
     });
 
     await assert.rejects(() => {
-      return ScopeService.validateSelectScope(user1, 'this-scope-does-not-exist');
+      return ScopeService.validateSelectedScope(user1, 'this-scope-does-not-exist');
     });
 
     await scope.delete();

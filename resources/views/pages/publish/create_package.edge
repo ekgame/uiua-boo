@@ -1,0 +1,54 @@
+@layout.base()
+  @slot('main')
+    <div class="max-w-lg mx-auto mt-20">
+      <h1 class="flex text-2xl font-bold text-gray-200">
+        Publish a package
+      </h1>
+
+      <div class="mt-2 text-gray-200 bg-gray-600 rounded-lg p-4 flex flex-col gap-2">
+        <h2 class="flex text-xl font-bold text-gray-200">Create a package</h2>
+
+        <p>
+          Give your package a name.<br/>
+          The name must be unique within the selected scope.
+        </p>
+
+        <form method="POST" action="{{ route('package.publish.submit_package', { scope: selectedScope.name }) }}">
+          {{ csrfField() }}
+
+          @ui.input({
+            type: 'text',
+            name: 'package_name',
+            error_field: 'package_name',
+            placeholder: 'package',
+            value: old('package_name'),
+          })
+            @slot('prefix')
+              <span class="text-gray-400 flex items-center">
+                @svg('tabler:at', { class: 'size-4 translate-y-[1px]' })
+                <a class="link" href="{{ route('package.publish') }}" title="Change scope">
+                  {{ selectedScope.name }}
+                </a>/
+              </span>
+            @endslot
+          @end
+
+          <p>
+            @ui.button({
+              submit: true,
+              variant: 'primary',
+              class: ['mt-2 flex items-center gap-2'],
+            })
+              @svg('tabler:plus', { class: 'size-6' })
+              Create a package
+            @end
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      document.querySelector('input[name="package_name"]').focus();
+    </script>
+  @endslot
+@end

@@ -5,13 +5,12 @@
     Select a scope for your package.
   </p>
 
-  <form method="POST" action="{{ route('package.publish.submit') }}">
+  <form method="POST" action="{{ route('package.publish.submit_scope') }}">
     <input type="hidden" name="action" value="select-scope" />
     {{ csrfField() }}
 
     @ui.select({
       name: 'selected_scope',
-      id: 'selected_scope',
       error_field: 'selected_scope',
       label: 'Scope',
       placeholder: 'Select a scope',

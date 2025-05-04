@@ -54,7 +54,7 @@ class ScopeService {
       .where('scope_member.member_type', 'IN', ['OWNER', 'ADMIN']);
   }
 
-  async validateSelectScope(user: User, scopeName: String): Promise<Scope> {
+  async validateSelectedScope(user: User, scopeName: String): Promise<Scope> {
     const validatedData = await selectScopeValidator.validate({
       selected_scope: scopeName,
     }, {
