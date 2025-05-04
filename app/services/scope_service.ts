@@ -16,6 +16,10 @@ class ScopeService {
     return result?.member_type || null;
   }
 
+  async isMember(user: User, scope: Scope) {
+    return this.getMemberRole(user, scope) !== null;
+  }
+
   async createScope(user: User, name: string): Promise<Scope> {
     const validatedData = await createScopeValidator.validate({
       new_scope: name,

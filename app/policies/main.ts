@@ -13,5 +13,6 @@
 */
 
 export const policies = {
-  ScopePolicy: () => import('#policies/scope_policy')
+  ScopePolicy: () => import('#policies/scope_policy'),
+  PackagePolicy: () => import('#policies/package_policy'),
 }

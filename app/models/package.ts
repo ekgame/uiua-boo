@@ -1,0 +1,52 @@
+import { DateTime } from 'luxon'
+import { BaseModel, beforeFetch, beforeFind, belongsTo, column, computed } from '@adonisjs/lucid/orm'
+import Scope from './scope.js'
+import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+
+export default class Package extends BaseModel {
+  static table = 'package'
+
+  @column({ isPrimary: true })
+  declare id: number
+
+  @column()
+  declare id_scope: number
+
+  @column()
+  declare name: string
+
+  @column()
+  declare description: string
+
+  @column()
+  declare isArchived: boolean
+
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+
+  @belongsTo(() => Scope, {
+    foreignKey: 'id_scope',
+  })
+  declare scope: BelongsTo<typeof Scope>
+
+  @computed()
+  get identifier() {
+    return `${this.scope.identifier}/${this.name}`;
+  }
+
+  @beforeFind()
+  static beforeFindHook(query: ModelQueryBuilderContract<typeof Package>) {
+    // Eagerly load the related scope
+    query.preload('scope');
+  }
+
+  @beforeFetch()
+  static beforeFetchHook(query: ModelQueryBuilderContract<typeof Package>) {
+    // Eagerly load the related scope
+    query.preload('scope');
+  }
+}

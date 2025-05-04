@@ -3,7 +3,7 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
 export default class extends BaseSchema {
   async up() {
     this.schema.createTable('user', (table) => {
-      table.increments('id').notNullable()
+      table.increments('id').primary()
       table.integer('github_id').notNullable()
       table.string('github_name', 256).notNullable()
       table.string('github_username', 256).notNullable()

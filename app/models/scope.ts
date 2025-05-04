@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, manyToMany } from '@adonisjs/lucid/orm'
-import type { ManyToMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, computed, hasMany, manyToMany } from '@adonisjs/lucid/orm'
+import type { HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
 import User from './user.js'
+import Package from './package.js'
 
 export default class Scope extends BaseModel {
   static table = 'scope'
@@ -26,4 +27,14 @@ export default class Scope extends BaseModel {
     pivotTimestamps: true,
   })
   declare members: ManyToMany<typeof User>;
+
+  @hasMany(() => Package, {
+    foreignKey: 'id_scope',
+  })
+  declare packages: HasMany<typeof Package>;
+
+  @computed()
+  get identifier() {
+    return `@${this.name}`;
+  }
 }

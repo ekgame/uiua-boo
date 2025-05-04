@@ -21,3 +21,15 @@ router.get('/publish', '#controllers/publish_controller.scopeForm').as('package.
 router.post('/publish', '#controllers/publish_controller.submitScope').as('package.publish.submit_scope').use(middleware.auth());
 router.get('/publish/:scope', '#controllers/publish_controller.packageForm').as('package.publish.package_form').use(middleware.auth());
 router.post('/publish/:scope', '#controllers/publish_controller.submitPackage').as('package.publish.submit_package').use(middleware.auth());
+
+router
+  .group(() => {
+    router.get('/', '#controllers/package_controller.show').as('package.show');
+    router.get('/init', '#controllers/package_controller.init').as('package.init').use(middleware.auth());
+  })
+  .prefix('/:scope/:name')
+  .where('scope', {
+    match: /^@/,
+    cast: (scope) => scope.replace(/^@/, ''),
+  })
+

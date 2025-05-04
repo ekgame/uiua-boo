@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http';
 import ScopeService from '#services/scope_service';
+import PackageService from '#services/package_service';
 
 export default class PublishController {
   async scopeForm({ view, auth }: HttpContext) {
@@ -17,9 +18,7 @@ export default class PublishController {
       selectedScope = await ScopeService.createScope(user, request.input('new_scope'));
     } else if (action === 'select-scope') {
       selectedScope = await ScopeService.validateSelectedScope(user, request.input('selected_scope'));
-    }
-
-    if (!selectedScope) {
+    } else {
       session.flashErrors({ general: 'Invalid action.' });
       return response.redirect().toRoute('package.publish');
     }
@@ -38,14 +37,18 @@ export default class PublishController {
     });
   }
 
-  async submitPackage({ response, auth, params }: HttpContext) {
+  async submitPackage({ request, response, auth, params }: HttpContext) {
     const user = auth.getUserOrFail();
     const selectedScope = await ScopeService.validateSelectedScope(user, params.scope);
 
-    // TODO: Implement package submission logic here
-
-    return response.redirect().toRoute('package.publish.package_form', {
-      scope: selectedScope.name,
+    const pack = await PackageService.createPackage(
+      selectedScope,
+      request.input('package_name'),
+    );
+    
+    return response.redirect().toRoute('package.init', {
+      scope: selectedScope.identifier,
+      name: pack.name,
     });
   }
 }
