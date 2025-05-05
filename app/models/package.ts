@@ -3,7 +3,6 @@ import { afterCreate, BaseModel, beforeFetch, beforeFind, belongsTo, column, com
 import Scope from './scope.js'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
-import { after } from 'node:test'
 
 export default class Package extends BaseModel {
   static table = 'package'
