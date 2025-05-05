@@ -1,8 +1,9 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeFetch, beforeFind, belongsTo, column, computed } from '@adonisjs/lucid/orm'
+import { afterCreate, BaseModel, beforeFetch, beforeFind, belongsTo, column, computed } from '@adonisjs/lucid/orm'
 import Scope from './scope.js'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+import { after } from 'node:test'
 
 export default class Package extends BaseModel {
   static table = 'package'
@@ -36,6 +37,12 @@ export default class Package extends BaseModel {
   @computed()
   get identifier() {
     return `${this.scope.identifier}/${this.name}`;
+  }
+
+  @afterCreate()
+  static async afterCreateHook(pack: Package) {
+    // Eagerly load the related scope
+    await pack.load('scope');
   }
 
   @beforeFind()

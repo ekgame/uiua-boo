@@ -1,6 +1,7 @@
 import Package from "#models/package";
 import Scope from "#models/scope";
 import { createPackageValidator } from "#validators/package";
+import logger from "@adonisjs/core/services/logger";
 
 class PackageService {
   async createPackage(scope: Scope, packageName: string): Promise<Package> {
@@ -13,6 +14,8 @@ class PackageService {
       name: package_name,
       id_scope: scope.id,
     });
+
+    logger.info(`Package created: ${newPackage.identifier}`);
 
     return newPackage;
   }
