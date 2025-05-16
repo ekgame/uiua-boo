@@ -23,10 +23,14 @@ router.get('/login/github', [AuthController, 'login']).as('auth.login').use(midd
 router.get('/login/github/callback', [AuthController, 'callback']).as('auth.login.callback');
 router.get('/logout', [AuthController, 'logout']).as('auth.logout').use(middleware.auth());
 
-router.get('/publish', [PublishController, 'scopeForm']).as('package.publish');
-router.post('/publish', [PublishController, 'submitScope']).as('package.publish.submit_scope').use(middleware.auth());
-router.get('/publish/:scope', [PublishController, 'packageForm']).as('package.publish.package_form').use(middleware.auth());
-router.post('/publish/:scope', [PublishController, 'submitPackage']).as('package.publish.submit_package').use(middleware.auth());
+router
+  .group(() => {
+    router.get('/', [PublishController, 'scopeForm']).as('package.publish');
+    router.post('/', [PublishController, 'submitScope']).as('package.publish.submit_scope').use(middleware.auth());
+    router.get('/:scope', [PublishController, 'packageForm']).as('package.publish.package_form').use(middleware.auth());
+    router.post('/:scope', [PublishController, 'submitPackage']).as('package.publish.submit_package').use(middleware.auth());
+  })
+  .prefix('/publish')
 
 router
   .group(() => {
