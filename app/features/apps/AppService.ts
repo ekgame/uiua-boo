@@ -17,7 +17,7 @@ class AppService {
 
     const newPendingApp = await PendingApp.create({
       appName: validated.app_name,
-      code: await this.generateCode(),
+      code: await this.generatePendingAppCode(),
       requestedPermissions: JSON.stringify(validated.requested_permissions),
       expiresAt: DateTime.local().plus(expirationTime),
     });
@@ -25,7 +25,7 @@ class AppService {
     return newPendingApp;
   }
 
-  private async generateCode(): Promise<string> {
+  private async generatePendingAppCode(): Promise<string> {
     let code: string;
 
     do {
