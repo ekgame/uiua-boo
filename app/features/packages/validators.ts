@@ -1,5 +1,5 @@
-import Package from '#models/package';
-import Scope from '#models/scope';
+import Package from './Package.js';
+import Scope from '../scopes/Scope.js';
 import vine, { SimpleMessagesProvider } from '@vinejs/vine'
 
 export const createPackageValidator = vine

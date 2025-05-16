@@ -10,22 +10,28 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js';
 
-router.get('/', '#controllers/browse_controller.home').as('home');
-router.get('/packages', '#controllers/browse_controller.packages').as('browse.packages');
+import HomeController from '../app/features/home/HomeController.js';
+import PackageController from '../app/features/packages/PackageController.js';
+import AuthController from '../app/features/users/AuthController.js';
+import PublishController from '../app/features/publishing/PublishController.js';
+import AppController from '../app/features/apps/AppController.js';
 
-router.get('/login/github', '#controllers/auth_controller.login').as('auth.login').use(middleware.guest());
-router.get('/login/github/callback', '#controllers/auth_controller.callback').as('auth.login.callback');
-router.get('/logout', '#controllers/auth_controller.logout').as('auth.logout').use(middleware.auth());
+router.get('/', [HomeController, 'home']).as('home');
+router.get('/packages', [PackageController, 'packages']).as('browse.packages');
 
-router.get('/publish', '#controllers/publish_controller.scopeForm').as('package.publish');
-router.post('/publish', '#controllers/publish_controller.submitScope').as('package.publish.submit_scope').use(middleware.auth());
-router.get('/publish/:scope', '#controllers/publish_controller.packageForm').as('package.publish.package_form').use(middleware.auth());
-router.post('/publish/:scope', '#controllers/publish_controller.submitPackage').as('package.publish.submit_package').use(middleware.auth());
+router.get('/login/github', [AuthController, 'login']).as('auth.login').use(middleware.guest());
+router.get('/login/github/callback', [AuthController, 'callback']).as('auth.login.callback');
+router.get('/logout', [AuthController, 'logout']).as('auth.logout').use(middleware.auth());
+
+router.get('/publish', [PublishController, 'scopeForm']).as('package.publish');
+router.post('/publish', [PublishController, 'submitScope']).as('package.publish.submit_scope').use(middleware.auth());
+router.get('/publish/:scope', [PublishController, 'packageForm']).as('package.publish.package_form').use(middleware.auth());
+router.post('/publish/:scope', [PublishController, 'submitPackage']).as('package.publish.submit_package').use(middleware.auth());
 
 router
   .group(() => {
-    router.get('/', '#controllers/package_controller.show').as('package.show');
-    router.get('/init', '#controllers/package_controller.init').as('package.init').use(middleware.auth());
+    router.get('/', [PackageController, 'show']).as('package.show');
+    router.get('/init', [PackageController, 'init']).as('package.init').use(middleware.auth());
   })
   .prefix('/:scope/:name')
   .where('scope', {
@@ -33,3 +39,8 @@ router
     cast: (scope) => scope.replace(/^@/, ''),
   })
 
+router
+  .group(() => {
+    router.post('/app/new', [AppController, 'requestAppApprovalCode']).as('app.pending.new');
+  })
+  .prefix('/api')

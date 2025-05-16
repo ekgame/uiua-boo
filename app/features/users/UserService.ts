@@ -1,5 +1,5 @@
-import User from "#models/user";
-import { UserRole } from "#types/user_role";
+import User from "./User.js";
+import { UserRole } from "./UserRole.js";
 import logger from "@adonisjs/core/services/logger";
 
 class UserService {

@@ -1,23 +1,11 @@
-import Package from "#models/package";
-import PackagePolicy from "#policies/package_policy";
-import PackageService from "#services/package_service";
+import Package from "./Package.js";
+import PackagePolicy from "./PackagePolicy.js";
+import PackageService from "./PackageService.js";
 import { errors, HttpContext } from "@adonisjs/core/http";
 
 export default class PackageController {
-  private async getPackageOrFail(params: Record<string, any>): Promise<Package> {
-    const pack = await PackageService.getPackage(
-      params.scope || null,
-      params.name || null,
-    );
-
-    if (!pack) {
-      throw new errors.E_HTTP_EXCEPTION(
-        `Package @${params.scope}/${params.name} not found`,
-        { status: 404 },
-      );
-    }
-
-    return pack;
+  async packages({ view }: HttpContext) {
+    return view.render('pages/packages');
   }
 
   async show({ view, params }: HttpContext) {
@@ -41,5 +29,21 @@ export default class PackageController {
     return view.render('pages/package/init', {
       pack,
     });
+  }
+
+  private async getPackageOrFail(params: Record<string, any>): Promise<Package> {
+    const pack = await PackageService.getPackage(
+      params.scope || null,
+      params.name || null,
+    );
+
+    if (!pack) {
+      throw new errors.E_HTTP_EXCEPTION(
+        `Package @${params.scope}/${params.name} not found`,
+        { status: 404 },
+      );
+    }
+
+    return pack;
   }
 }

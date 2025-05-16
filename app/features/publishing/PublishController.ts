@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http';
-import ScopeService from '#services/scope_service';
-import PackageService from '#services/package_service';
+import ScopeService from '../scopes/ScopeService.js';
+import PackageService from '../packages/PackageService.js';
 
 export default class PublishController {
   async scopeForm({ view, auth }: HttpContext) {

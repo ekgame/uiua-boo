@@ -1,6 +1,6 @@
-import Scope from '#models/scope';
-import User from '#models/user';
-import ScopePolicy from '#policies/scope_policy';
+import Scope from './Scope.js';
+import User from '../users/User.js';
+import ScopePolicy from './ScopePolicy.js';
 import { Bouncer } from '@adonisjs/bouncer';
 import vine, { SimpleMessagesProvider } from '@vinejs/vine';
 import { FieldContext } from '@vinejs/vine/types';

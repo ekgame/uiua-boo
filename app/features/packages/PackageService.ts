@@ -1,6 +1,6 @@
-import Package from "#models/package";
-import Scope from "#models/scope";
-import { createPackageValidator } from "#validators/package";
+import Package from "./Package.js";
+import Scope from "../scopes/Scope.js";
+import { createPackageValidator } from "./validators.js";
 import logger from "@adonisjs/core/services/logger";
 
 class PackageService {

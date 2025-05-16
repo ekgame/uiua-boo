@@ -1,6 +1,6 @@
-import Scope from '#models/scope';
-import User from '#models/user';
-import ScopeService from '#services/scope_service';
+import Scope from './Scope.js';
+import User from '../users/User.js';
+import ScopeService from './ScopeService.js';
 import { BasePolicy } from '@adonisjs/bouncer';
 
 export default class ScopePolicy extends BasePolicy {

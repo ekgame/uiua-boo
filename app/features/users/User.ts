@@ -1,8 +1,8 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, manyToMany } from '@adonisjs/lucid/orm'
 import type { ManyToMany } from '@adonisjs/lucid/types/relations';
-import Scope from '#models/scope';
-import type { UserRole } from '#types/user_role';
+import Scope from '../scopes/Scope.js';
+import type { UserRole } from './UserRole.js';
 
 export default class User extends BaseModel {
   static table = 'user';

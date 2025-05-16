@@ -1,6 +1,6 @@
-import Scope from "#models/scope";
-import User from "#models/user";
-import { createScopeValidator, selectScopeValidator } from "#validators/scope";
+import Scope from "./Scope.js";
+import User from "../users/User.js";
+import { createScopeValidator, selectScopeValidator } from "./validators.js";
 import logger from "@adonisjs/core/services/logger";
 import db from '@adonisjs/lucid/services/db';
 

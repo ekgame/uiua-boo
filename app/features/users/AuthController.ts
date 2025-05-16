@@ -1,5 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http';
-import UserService from '#services/user_service';
+import UserService from './UserService.js';
 import router from '@adonisjs/core/services/router';
 
 const RETURN_ROUTE_NAME_PARAM = 'return_to_route_name';

@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import { afterCreate, BaseModel, beforeFetch, beforeFind, belongsTo, column, computed } from '@adonisjs/lucid/orm'
-import Scope from './scope.js'
+import Scope from '../scopes/Scope.js'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 
