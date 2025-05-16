@@ -4,6 +4,7 @@ use owo_colors::OwoColorize;
 pub mod common;
 mod commands {
     pub mod init;
+    pub mod publish;
 }
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -39,9 +40,7 @@ fn main() {
     let cli = Cli::parse();
     match cli.command {
         Commands::Init(args) => commands::init::run_init(args),
-        Commands::Publish(_args) => {
-            panic!("TODO: Implement publish command");
-        }
+        Commands::Publish(args) => commands::publish::run_publish(args),
         Commands::Docs => {
             panic!("TODO: Implement docs command");
         }
@@ -63,4 +62,3 @@ pub(crate) fn print_warning(message: &str) {
 pub(crate) fn print_error(message: &str) {
     println!("{} {}", "[ERROR]".red(), message.red());
 }
-

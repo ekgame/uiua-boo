@@ -1,7 +1,7 @@
 use std::path::Path;
 
-use crate::common::{validate_package_name, BooPackageDefinition};
 use crate::InitArgs;
+use crate::common::{BooPackageDefinition, validate_package_name};
 
 use crate::{print_error, print_success};
 
@@ -14,7 +14,10 @@ pub(crate) fn run_init(args: InitArgs) {
 
     let package_name = validate_package_name(&args.package_name);
     if let Err(e) = package_name {
-        print_error(&format!("Invalid package name '{}': {}", args.package_name, e));
+        print_error(&format!(
+            "Invalid package name '{}': {}",
+            args.package_name, e
+        ));
         return;
     }
 

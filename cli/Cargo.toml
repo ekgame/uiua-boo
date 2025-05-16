@@ -5,7 +5,12 @@ edition = "2024"
 
 [dependencies]
 clap = { version = "4.5.38", features = ["derive"] }
+glob = "0.3.2"
 owo-colors = "4.2.0"
 regex = "1.11.1"
+semver = "1.0.26"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.140"
+flate2 = "1.1.1"
+tar = "0.4.44"
+uuid = { version = "1.16.0", features = ["v4"] }

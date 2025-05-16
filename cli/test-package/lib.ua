@@ -1,0 +1,1 @@
+Greet ← &p $"Hello, _!"
