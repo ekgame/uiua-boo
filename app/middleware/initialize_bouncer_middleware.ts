@@ -14,8 +14,8 @@ export default class InitializeBouncerMiddleware {
      */
     ctx.bouncer = new Bouncer(
       () => ctx.auth.user || null,
-      {},
-      {}
+      undefined,
+      undefined
     ).setContainerResolver(ctx.containerResolver)
 
     /**
