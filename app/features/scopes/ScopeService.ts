@@ -3,9 +3,10 @@ import User from "../users/User.js";
 import { createScopeValidator, selectScopeValidator } from "./validators.js";
 import logger from "@adonisjs/core/services/logger";
 import db from '@adonisjs/lucid/services/db';
+import { ScopeMemberRole } from "./ScopeMemberRole.js";
 
 class ScopeService {
-  async getMemberRole(user: User, scope: Scope): Promise<string|null> {
+  async getMemberRole(user: User, scope: Scope): Promise<ScopeMemberRole|null> {
     const result = await db.query()
       .select('scope_member.member_type')
       .from('scope_member')

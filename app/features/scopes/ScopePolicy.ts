@@ -2,6 +2,7 @@ import Scope from './Scope.js';
 import User from '../users/User.js';
 import ScopeService from './ScopeService.js';
 import { BasePolicy } from '@adonisjs/bouncer';
+import { ScopeMemberRole } from './ScopeMemberRole.js';
 
 export default class ScopePolicy extends BasePolicy {
   /**
@@ -10,6 +11,6 @@ export default class ScopePolicy extends BasePolicy {
    */
   async use(user: User, scope: Scope): Promise<boolean> {
     const role = await ScopeService.getMemberRole(user, scope);
-    return role === 'OWNER' || role === 'ADMIN';
+    return role === ScopeMemberRole.OWNER || role === ScopeMemberRole.ADMIN;
   }
 }
