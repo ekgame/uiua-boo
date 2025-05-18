@@ -1,8 +1,12 @@
-<h1>
-  404 - Page not found
-</h1>
-<p>
-  This template is rendered by the
-  <a href="http://docs.adonisjs.com/guides/exception-handling#status-pages">status pages feature</a>
-  of the global exception handler.
-</p>
+@layout.base()
+  @slot('main')
+    <div class="max-w-lg mx-auto mt-20 text-center">
+      <div class="text-7xl font-bold">
+        404
+      </div>
+      <div class="mt-2">
+        Could not find what you're looking for.
+      </div>
+    </div>
+  @endslot
+@end
