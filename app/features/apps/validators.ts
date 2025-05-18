@@ -18,7 +18,7 @@ export const appPermissionSchema = vine
   .merge(appPermission);
 
 export const appPermissionsArraySchema = vine.compile(
-  vine.array(appPermissionSchema)
+  vine.array(appPermissionSchema).minLength(1)
 );
 
 export const pendingAppSchema = vine.compile(
