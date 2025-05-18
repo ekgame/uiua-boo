@@ -14,7 +14,7 @@ export default class AppController {
 
   }
 
-  async requestAppApprovalCode({ request }: HttpContext) {
+  async apiRequestApp({ request }: HttpContext) {
     const { app_name, requested_permissions } = request.body();
     const pendingApp = await AppService.createPendingApp(app_name, requested_permissions);
     

@@ -1,3 +1,4 @@
+import logger from "@adonisjs/core/services/logger";
 import PendingApp from "./PendingApp.js";
 import { appPermissionsArraySchema, pendingAppSchema } from "./validators.js";
 import { Infer } from "@vinejs/vine/types";
@@ -33,6 +34,21 @@ class AppService {
     } while (await PendingApp.findBy("code", code));
 
     return code;
+  }
+
+  async removeExpiredPendingApps(now: DateTime = DateTime.local()): Promise<number> {
+    const expiredApps = await PendingApp.query().where("expires_at", "<", now.toMillis());
+
+    if (expiredApps.length === 0) {
+      return 0;
+    }
+
+    for (const app of expiredApps) {
+      await app.delete();
+    }
+
+    logger.info(`Removed ${expiredApps.length} expired pending apps.`);
+    return expiredApps.length;
   }
 }
 

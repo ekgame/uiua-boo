@@ -58,6 +58,7 @@
     "edge-iconify": "^2.0.1",
     "edge.js": "^6.2.1",
     "luxon": "^3.6.1",
+    "node-cron": "^4.0.5",
     "reflect-metadata": "^0.2.2",
     "tailwindcss": "^4.1.4",
     "ts-results": "^3.3.0"

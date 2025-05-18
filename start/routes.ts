@@ -45,6 +45,7 @@ router
 
 router
   .group(() => {
-    router.post('/app/new', [AppController, 'requestAppApprovalCode']).as('app.pending.new');
+    router.post('/app/request', [AppController, 'apiRequestApp']).as('app.new.request');
   })
+  .use(middleware.json())
   .prefix('/api')
