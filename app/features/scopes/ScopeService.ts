@@ -34,11 +34,7 @@ class ScopeService {
       await scope
         .related('members')
         .attach(
-          {
-            [user.id]: {
-              member_type: 'OWNER',
-            }
-          },
+          { [user.id]: { member_type: 'OWNER' } },
           trx
         );
 
