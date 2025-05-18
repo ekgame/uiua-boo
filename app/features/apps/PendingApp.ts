@@ -1,7 +1,10 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, beforeFind, column } from '@adonisjs/lucid/orm'
 import { appPermissionsArraySchema } from './validators.js'
 import { parseJsonValidated } from '../../utils/validation.js'
+import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+
+export type PendingAppStatus = 'PENDING' | 'APPROVED' | 'DENIED'
 
 export default class PendingApp extends BaseModel {
   public static table = 'pending_app'
@@ -22,6 +25,9 @@ export default class PendingApp extends BaseModel {
   @column()
   declare requestedPermissions: string
 
+  @column()
+  declare status: PendingAppStatus
+
   @column.dateTime()
   declare expiresAt: DateTime
 
@@ -30,6 +36,11 @@ export default class PendingApp extends BaseModel {
 
   async requestedPermissionsArray() {
     return await parseJsonValidated(appPermissionsArraySchema, this.requestedPermissions)
+  }
+
+  @beforeFind()
+  static beforeFindHook(query: ModelQueryBuilderContract<typeof PendingApp>) {
+    query.where('expires_at', '>', DateTime.now().toSQL());
   }
 }
 

@@ -1,0 +1,43 @@
+<div class="mt-2 text-gray-200 bg-gray-600 rounded-lg p-4">
+  <p>
+    <strong>{{ pendingApp.appName }}</strong> is requesting to act on your behalf.
+  </p>
+
+  <p class="mt-4">
+    Requested permissions:
+  </p>
+
+  @!app.permissions.list({
+    permissions: requestedPermissions
+  })
+
+  <p class="mt-4">
+    Make sure you trust <span class="font-bold">{{ pendingApp.appName }}</span> before approving it.
+  </p>
+
+  <form method="POST" class="mt-2 flex gap-4">
+    {{ csrfField() }}
+
+    @ui.button({
+      submit: true,
+      variant: 'primary',
+      class: ['flex flex-1 items-center gap-1'],
+      name: 'action',
+      value: 'approve',
+    })
+      @svg('tabler:check', { class: 'size-6' })
+      Approve
+    @end
+
+    @ui.button({
+      submit: true,
+      variant: 'danger',
+      class: ['flex flex-1 items-center gap-1'],
+      name: 'action',
+      value: 'deny',
+    })
+      @svg('tabler:x', { class: 'size-6' })
+      Deny
+    @end
+  </form>
+</div>

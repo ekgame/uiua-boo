@@ -1,0 +1,17 @@
+@if(permission.scope && permission.name && permission.version)
+  <p>
+    <strong>{{ '@' + permission.scope }}/{{ permission.name }}</strong>
+    <span class="px-2 py-1 bg-yellow-700 rounded-2xl font-bold">{{ permission.version }}</span>
+    - publish a new version of the package.
+  </p>
+@elseif(permission.scope && permission.name)
+  <p>
+    <strong>{{ '@' + permission.scope }}/{{ permission.name }}</strong>
+    - publish a new version of the package.
+  </p>
+@elseif(permission.scope)
+  <p>
+    <strong>{{ '@' + permission.scope }}</strong>
+    - publish new version of a package in this scope.
+  </p>
+@end

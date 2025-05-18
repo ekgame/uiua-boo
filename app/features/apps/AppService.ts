@@ -1,9 +1,9 @@
-import logger from "@adonisjs/core/services/logger";
 import PendingApp from "./PendingApp.js";
 import { appPermissionsArraySchema, pendingAppSchema } from "./validators.js";
 import { Infer } from "@vinejs/vine/types";
 import { randomUUID } from "crypto";
 import { DateTime, Duration } from "luxon";
+import User from "../users/User.js";
 
 class AppService {
   async createPendingApp(
@@ -38,7 +38,7 @@ class AppService {
 
   async removeExpiredPendingApps(now: DateTime = DateTime.local()): Promise<number> {
     const expiredApps = await PendingApp.query()
-      .where("expires_at", "<", now.toISO()!);
+      .where("expires_at", "<", now.toSQL()!);
 
     if (expiredApps.length === 0) {
       return 0;
@@ -49,6 +49,17 @@ class AppService {
     }
     
     return expiredApps.length;
+  }
+
+  async approvePendingApp(pendingApp: PendingApp, user: User) {
+    // TODO: create an application
+    pendingApp.status = 'APPROVED';
+    await pendingApp.save();
+  }
+
+  async denyPendingApp(pendingApp: PendingApp) {
+    pendingApp.status = 'DENIED';
+    await pendingApp.save();
   }
 }
 

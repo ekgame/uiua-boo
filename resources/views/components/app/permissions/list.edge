@@ -1,0 +1,11 @@
+<ul class="flex flex-col gap-2 mt-2 text-gray-200">
+  @each(permission in permissions)
+    <li class="bg-gray-800 rounded-lg p-2">
+      @if(permission.type == 'package.upload-new-version')
+        @include('components/app/permissions/package.upload-new-version')
+      @else
+        <span class="font-bold">{{ permission.type }}</span> - Unknown permission, please contact us if you see this message.
+      @end
+    </li>
+  @end
+</ul>

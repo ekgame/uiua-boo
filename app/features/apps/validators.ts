@@ -1,8 +1,8 @@
 import vine from '@vinejs/vine'
 
 const appPermission = vine.group([
-  vine.group.if((data) => data.type === 'update.package', {
-    type: vine.literal('update.package'),
+  vine.group.if((data) => data.type === 'package.upload-new-version', {
+    type: vine.literal('package.upload-new-version'),
     scope: vine.string().maxLength(32),
     name: vine.string().maxLength(32).optional(),
     version: vine.string().maxLength(32).optional(),
@@ -12,7 +12,7 @@ const appPermission = vine.group([
 export const appPermissionSchema = vine
   .object({
     type: vine.enum([
-      'update.package',
+      'package.upload-new-version',
     ]),
   })
   .merge(appPermission);

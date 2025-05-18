@@ -7,6 +7,7 @@ export default class extends BaseSchema {
       table.string('app_name').notNullable()
       table.string('code').notNullable()
       table.text('requested_permissions').notNullable()
+      table.enum('status', ['PENDING', 'APPROVED', 'DENIED']).defaultTo('PENDING')
       table.timestamp('expires_at').notNullable()
       table.timestamp('created_at')
     })

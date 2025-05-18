@@ -48,7 +48,16 @@ router
 
 router
   .group(() => {
+    router.get('/request/:code', [AppController, 'viewPendingApp']).as('app.request.view');
+    router.post('/request/:code', [AppController, 'submitPendingApp']).as('app.request.submit').use(middleware.auth())
+  })
+  .prefix('/app')
+
+router
+  .group(() => {
     router.post('/app/request', [AppController, 'apiRequestApp']).as('app.new.request');
+    router.delete('/app/request/:code', [AppController, 'apiDeleteAppRequest']).as('app.new.request.delete').use(middleware.auth());
+    router.get('/app/request/:code', [AppController, 'apiPendingAppStatus']).as('app.request.status');
   })
   .use(middleware.json())
   .prefix('/api')
