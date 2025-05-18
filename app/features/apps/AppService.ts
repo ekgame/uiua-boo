@@ -37,7 +37,8 @@ class AppService {
   }
 
   async removeExpiredPendingApps(now: DateTime = DateTime.local()): Promise<number> {
-    const expiredApps = await PendingApp.query().where("expires_at", "<", now.toMillis());
+    const expiredApps = await PendingApp.query()
+      .where("expires_at", "<", now.toISO()!);
 
     if (expiredApps.length === 0) {
       return 0;
@@ -46,8 +47,7 @@ class AppService {
     for (const app of expiredApps) {
       await app.delete();
     }
-
-    logger.info(`Removed ${expiredApps.length} expired pending apps.`);
+    
     return expiredApps.length;
   }
 }

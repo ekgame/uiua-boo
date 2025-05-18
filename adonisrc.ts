@@ -13,7 +13,8 @@ export default defineConfig({
   commands: [
     () => import('@adonisjs/core/commands'),
     () => import('@adonisjs/lucid/commands'),
-    () => import('@adonisjs/bouncer/commands')
+    () => import('@adonisjs/bouncer/commands'),
+    () => import('adonisjs-scheduler/commands')
   ],
 
   /*
@@ -41,7 +42,11 @@ export default defineConfig({
     () => import('@adonisjs/lucid/database_provider'),
     () => import('@adonisjs/auth/auth_provider'),
     () => import('@adonisjs/ally/ally_provider'),
-    () => import('@adonisjs/bouncer/bouncer_provider')
+    () => import('@adonisjs/bouncer/bouncer_provider'),
+    {
+      file: () => import('adonisjs-scheduler/scheduler_provider'),
+      environment: ['web', 'console'],
+    }
   ],
 
   /*
@@ -56,6 +61,10 @@ export default defineConfig({
     () => import('#start/routes'),
     () => import('#start/kernel'),
     () => import('#start/view'),
+    {
+      file: () => import('#start/scheduler'),
+      environment: ['web', 'console'],
+    }
   ],
 
   /*
