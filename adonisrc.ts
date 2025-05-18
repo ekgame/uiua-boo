@@ -14,7 +14,8 @@ export default defineConfig({
     () => import('@adonisjs/core/commands'),
     () => import('@adonisjs/lucid/commands'),
     () => import('@adonisjs/bouncer/commands'),
-    () => import('adonisjs-scheduler/commands')
+    () => import('adonisjs-scheduler/commands'),
+    () => import('adonisjs-jobs/commands')
   ],
 
   /*
@@ -46,7 +47,8 @@ export default defineConfig({
     {
       file: () => import('adonisjs-scheduler/scheduler_provider'),
       environment: ['web', 'console'],
-    }
+    },
+    () => import('adonisjs-jobs/jobs_provider')
   ],
 
   /*

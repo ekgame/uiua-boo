@@ -11,7 +11,8 @@
 
 import 'reflect-metadata'
 import { Ignitor, prettyPrintError } from '@adonisjs/core'
-import { Worker } from 'adonisjs-scheduler'
+import { Worker as SchedulerWorker } from 'adonisjs-scheduler'
+import { Worker as JobsWorker } from 'adonisjs-jobs'
 
 /**
  * URL to the application root. AdonisJS need it to resolve
@@ -36,13 +37,16 @@ new Ignitor(APP_ROOT, { importer: IMPORTER })
       await import('#start/env')
     })
     app.ready(async () => {
-      const worker = new Worker(app)
+      const schedulerWorker = new SchedulerWorker(app)
+      const jobsWorker = new JobsWorker(app)
 
       app.terminating(async () => {
-        await worker.stop()
+        await schedulerWorker.stop()
+        await jobsWorker.stop()
       })
 
-      await worker.start()
+      await schedulerWorker.start()
+      await jobsWorker.start()
     })
     app.listen('SIGTERM', () => app.terminate())
     app.listenIf(app.managedByPm2, 'SIGINT', () => app.terminate())

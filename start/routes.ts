@@ -16,6 +16,9 @@ import AuthController from '../app/features/users/AuthController.js';
 import PublishController from '../app/features/publishing/PublishController.js';
 import AppController from '../app/features/apps/AppController.js';
 
+// TODO: add admin requirement for the dashboard
+router.jobs()
+
 router.get('/', [HomeController, 'home']).as('home');
 router.get('/packages', [PackageController, 'packages']).as('browse.packages');
 
