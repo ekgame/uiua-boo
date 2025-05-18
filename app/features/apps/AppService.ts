@@ -4,6 +4,7 @@ import { Infer } from "@vinejs/vine/types";
 import { randomUUID } from "crypto";
 import { DateTime, Duration } from "luxon";
 import User from "../users/User.js";
+import App from "./App.js";
 
 class AppService {
   async createPendingApp(
@@ -36,6 +37,14 @@ class AppService {
     return code;
   }
 
+  private async generateAppToken(): Promise<string> {
+    let token: string;
+    do {
+      token = randomUUID();
+    } while (await App.findBy("token", token));
+    return token;
+  }
+
   async removeExpiredPendingApps(now: DateTime = DateTime.local()): Promise<number> {
     const expiredApps = await PendingApp.query()
       .where("expires_at", "<", now.toSQL()!);
@@ -51,10 +60,39 @@ class AppService {
     return expiredApps.length;
   }
 
-  async approvePendingApp(pendingApp: PendingApp, user: User) {
-    // TODO: create an application
+  async removeExpiredApps(now: DateTime = DateTime.local()): Promise<number> {
+    const expiredApps = await App.query()
+      .where("expires_at", "<", now.toSQL()!);
+
+    if (expiredApps.length === 0) {
+      return 0;
+    }
+
+    for (const app of expiredApps) {
+      await app.delete();
+    }
+    
+    return expiredApps.length;
+  }
+
+  async approvePendingApp(
+    pendingApp: PendingApp,
+    user: User,
+    expirationTime: Duration = Duration.fromObject({ minutes: 10 }),
+  ): Promise<App> {
+    const app = await App.create({
+      userId: user.id,
+      appName: pendingApp.appName,
+      token: await this.generateAppToken(),
+      permissions: pendingApp.requestedPermissions,
+      expiresAt: DateTime.local().plus(expirationTime),
+    });
+
+    pendingApp.appId = app.id;
     pendingApp.status = 'APPROVED';
     await pendingApp.save();
+
+    return app;
   }
 
   async denyPendingApp(pendingApp: PendingApp) {

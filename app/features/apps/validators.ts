@@ -3,7 +3,7 @@ import vine from '@vinejs/vine'
 const appPermission = vine.group([
   vine.group.if((data) => data.type === 'package.upload-new-version', {
     type: vine.literal('package.upload-new-version'),
-    scope: vine.string().maxLength(32),
+    scope: vine.string().minLength(2).maxLength(32),
     name: vine.string().maxLength(32).optional(),
     version: vine.string().maxLength(32).optional(),
   }),

@@ -12,7 +12,7 @@ class PackageService {
 
     const newPackage = await Package.create({
       name: package_name,
-      id_scope: scope.id,
+      scopeId: scope.id,
     });
 
     logger.info(`Package created: ${newPackage.identifier}`);

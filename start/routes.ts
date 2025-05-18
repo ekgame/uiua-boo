@@ -56,7 +56,7 @@ router
 router
   .group(() => {
     router.post('/app/request', [AppController, 'apiRequestApp']).as('app.new.request');
-    router.delete('/app/request/:code', [AppController, 'apiDeleteAppRequest']).as('app.new.request.delete').use(middleware.auth());
+    router.delete('/app/request/:code', [AppController, 'apiDeleteAppRequest']).as('app.new.request.delete');
     router.get('/app/request/:code', [AppController, 'apiPendingAppStatus']).as('app.request.status');
   })
   .use(middleware.json())

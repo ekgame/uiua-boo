@@ -1,0 +1,15 @@
+<div class="mt-2 text-gray-200 bg-gray-600 rounded-lg p-4 flex flex-col gap-4">
+  <p>You must be logged in to authorize an app.</p>
+
+  <p>
+    @ui.button({
+      type: 'link',
+      variant: 'primary',
+      href: route('auth.login', {}, { qs: { back: route('app.request.view', { code: pendingApp.code }) }}),
+      class: 'flex items-center gap-2',
+    })
+      @svg('tabler:brand-github', { class: 'size-6' })
+      Log in with GitHub
+    @end
+  </p>
+</div>

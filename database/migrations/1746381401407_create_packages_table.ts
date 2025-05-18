@@ -4,7 +4,7 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable('package', (table) => {
       table.increments('id').primary()
-      table.integer('id_scope').notNullable()
+      table.integer('scope_id').notNullable()
 
       table.string('name').notNullable()
       table.string('description', 255).notNullable().defaultTo('')

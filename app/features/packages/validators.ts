@@ -15,7 +15,7 @@ export const createPackageValidator = vine
         .unique(async (_db, value, field) => {
           const result = await Package.query()
             .where('name', value)
-            .where('id_scope', field.meta.scope.id)
+            .where('scope_id', field.meta.scope.id)
             .first();
           return result === null;
         }),

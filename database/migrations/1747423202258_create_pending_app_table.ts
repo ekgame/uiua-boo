@@ -4,6 +4,7 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable('pending_app', (table) => {
       table.increments('id')
+      table.integer('app_id').nullable().defaultTo(null)
       table.string('app_name').notNullable()
       table.string('code').notNullable()
       table.text('requested_permissions').notNullable()

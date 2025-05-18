@@ -5,7 +5,9 @@
         Authorization for <span class="px-3 bg-purple-600 rounded-3xl">{{ pendingApp.appName }}</span>
       </h1>
 
-      @if(pendingApp.status === 'PENDING')
+      @if(!auth.user)
+        @include('pages/app/login')
+      @elseif(pendingApp.status === 'PENDING')
         @include('pages/app/pending')
       @elseif(pendingApp.status === 'APPROVED')
         <div class="mt-2 text-green-200 bg-green-900 rounded-lg p-4">

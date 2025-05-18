@@ -29,7 +29,7 @@ export default class Scope extends BaseModel {
   declare members: ManyToMany<typeof User>;
 
   @hasMany(() => Package, {
-    foreignKey: 'id_scope',
+    foreignKey: 'scope_id',
   })
   declare packages: HasMany<typeof Package>;
 

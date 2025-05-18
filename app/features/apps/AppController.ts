@@ -1,7 +1,7 @@
 import AppService from './AppService.js';
-import type { HttpContext } from '@adonisjs/core/http';
+import { type HttpContext } from '@adonisjs/core/http';
 import PendingApp from './PendingApp.js';
-import { request } from 'http';
+import { makeAbsoluteUrl } from '../../utils/url.js';
 
 export default class AppController {
   async viewPendingApp({ view, params }: HttpContext) {
@@ -16,6 +16,11 @@ export default class AppController {
   async submitPendingApp({ request, auth, params, session, response }: HttpContext) {
     const user = auth.getUserOrFail();
     const pendingApp = await PendingApp.findByOrFail('code', params.code);
+
+    if (pendingApp.status !== 'PENDING') {
+      session.flash('error', 'App request is no longer pending.');
+      return response.redirect().back();
+    }
 
     const action = request.input('action');
     if (action === 'approve') {
@@ -37,21 +42,22 @@ export default class AppController {
     return {
       code: pendingApp.code,
       expires_at: pendingApp.expiresAt.toISO(),
+      request_url: makeAbsoluteUrl('app.request.view', { code: pendingApp.code }),
     };
   }
 
   async apiPendingAppStatus({ params }: HttpContext) {
     const pendingApp = await PendingApp.findByOrFail('code', params.code);
-    let appToken = null;
 
-    if (pendingApp.status === 'APPROVED') {
+    if (pendingApp.status === 'APPROVED' && pendingApp.appId) {
+      await pendingApp.load('app');
     }
 
     return {
       status: pendingApp.status,
       expires_at: pendingApp.expiresAt.toISO(),
       requested_permissions: await pendingApp.requestedPermissionsArray(),
-      app_token: appToken,
+      app_token: pendingApp.app?.token || null,
     };
   }
 

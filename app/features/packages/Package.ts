@@ -11,7 +11,7 @@ export default class Package extends BaseModel {
   declare id: number
 
   @column()
-  declare id_scope: number
+  declare scopeId: number
 
   @column()
   declare name: string
@@ -29,7 +29,7 @@ export default class Package extends BaseModel {
   declare updatedAt: DateTime
 
   @belongsTo(() => Scope, {
-    foreignKey: 'id_scope',
+    foreignKey: 'scope_id',
   })
   declare scope: BelongsTo<typeof Scope>
 

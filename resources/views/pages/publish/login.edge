@@ -5,7 +5,7 @@
     @ui.button({
       type: 'link',
       variant: 'primary',
-      href: route('auth.login', {}, { qs: { back: 'package.publish' }}),
+      href: route('auth.login', {}, { qs: { back: route('package.publish') }}),
       class: 'flex items-center gap-2',
     })
       @svg('tabler:brand-github', { class: 'size-6' })
