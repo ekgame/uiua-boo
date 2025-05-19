@@ -4,7 +4,7 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable('pending_app', (table) => {
       table.increments('id')
-      table.integer('access_token_id').nullable().defaultTo(null)
+      table.string('access_token').nullable().defaultTo(null)
       table.string('app_name').notNullable()
       table.string('private_code').notNullable()
       table.string('public_code').notNullable()

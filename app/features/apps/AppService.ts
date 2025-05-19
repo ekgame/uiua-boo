@@ -57,10 +57,18 @@ class AppService {
     user: User,
     expirationTime: Duration = Duration.fromObject({ minutes: 10 }),
   ): Promise<void> {
+    const token = await User.accessTokens.create(
+      user,
+      await pendingApp.rawRequestedPermissionsArray(),
+      {
+        name: pendingApp.appName,
+        expiresIn: expirationTime.as('seconds'),
+      }
+    );
 
+    pendingApp.accessToken = token.value?.release()!;
     pendingApp.status = 'APPROVED';
     await pendingApp.save();
-
   }
 
   async denyPendingApp(pendingApp: PendingApp) {

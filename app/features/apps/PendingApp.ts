@@ -13,7 +13,7 @@ export default class PendingApp extends BaseModel {
   declare id: number
 
   @column()
-  declare accessTokenId: number|null
+  declare accessToken: string|null
 
   @column()
   declare appName: string
@@ -39,6 +39,10 @@ export default class PendingApp extends BaseModel {
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+
+  async rawRequestedPermissionsArray(): Promise<string[]> {
+    return await parseJsonValidated(appPermissionsArraySchema, this.requestedPermissions);
+  }
 
   async requestedPermissionsArray(): Promise<AccessTokenPermission[]> {
     const permissionArray = await parseJsonValidated(appPermissionsArraySchema, this.requestedPermissions);

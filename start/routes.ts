@@ -48,16 +48,16 @@ router
 
 router
   .group(() => {
-    router.get('/request/:code', [AppController, 'viewPendingApp']).as('app.request.view');
-    router.post('/request/:code', [AppController, 'submitPendingApp']).as('app.request.submit').use(middleware.auth())
+    router.get('/request/:code', [AppController, 'viewPendingApp']).as('auth.request.view');
+    router.post('/request/:code', [AppController, 'submitPendingApp']).as('auth.request.submit').use(middleware.auth())
   })
-  .prefix('/app')
+  .prefix('/auth')
 
 router
   .group(() => {
-    router.post('/app/request', [AppController, 'apiRequestApp']).as('app.new.request');
-    router.delete('/app/request/:code', [AppController, 'apiDeleteAppRequest']).as('app.new.request.delete');
-    router.get('/app/request/:code', [AppController, 'apiPendingAppStatus']).as('app.request.status');
+    router.post('/auth/request', [AppController, 'apiRequestApp']).as('auth.new.request');
+    router.delete('/auth/request/:code', [AppController, 'apiDeleteAppRequest']).as('auth.new.request.delete');
+    router.get('/auth/request/:code', [AppController, 'apiPendingAppStatus']).as('auth.request.status');
   })
   .use(middleware.json())
   .prefix('/api')

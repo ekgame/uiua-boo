@@ -25,8 +25,7 @@ export default class AppController {
     const action = request.input('action');
     if (action === 'approve') {
       await AppService.approvePendingApp(pendingApp, user);
-    }
-    else if (action === 'deny') {
+    } else if (action === 'deny') {
       await AppService.denyPendingApp(pendingApp);
     } else {
       session.flash('error', 'Invalid action');
@@ -43,22 +42,26 @@ export default class AppController {
       private_code: pendingApp.privateCode,
       public_code: pendingApp.publicCode,
       expires_at: pendingApp.expiresAt.toISO(),
-      request_url: makeAbsoluteUrl('app.request.view', { code: pendingApp.publicCode }),
+      request_url: makeAbsoluteUrl('auth.request.view', { code: pendingApp.publicCode }),
     };
   }
 
   async apiPendingAppStatus({ params }: HttpContext) {
     const pendingApp = await PendingApp.findByOrFail('private_code', params.code);
+    let token = null;
 
-    if (pendingApp.status === 'APPROVED' && pendingApp.accessTokenId) {
-      
+    if (pendingApp.status === 'APPROVED' && pendingApp.accessToken) {
+      token = pendingApp.accessToken;
     }
 
     return {
       status: pendingApp.status,
       expires_at: pendingApp.expiresAt.toISO(),
       requested_permissions: await pendingApp.requestedPermissionsArray(),
-      access_token: null,
+      access_token: !token ? null : {
+        type: 'Bearer',
+        token: token,
+      },
     };
   }
 
