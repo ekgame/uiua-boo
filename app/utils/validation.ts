@@ -12,3 +12,13 @@ export async function parseJsonValidated<T extends VineValidator<any,any>>(schem
 
   return await schema.validate(parsed);
 }
+
+function concatRegexPair(first: RegExp, second: RegExp) {
+  let flags = first.flags + second.flags;
+  flags = Array.from(new Set(flags.split(''))).join();
+  return new RegExp(first.source + second.source, flags);
+}
+
+export function concatRegex(...regexes: RegExp[]) {
+  return regexes.reduce((acc, regex) => concatRegexPair(acc, regex));
+}

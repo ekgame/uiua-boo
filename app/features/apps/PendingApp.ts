@@ -1,10 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeFind, column, hasMany, hasOne } from '@adonisjs/lucid/orm'
-import { appPermissionsArraySchema } from './validators.js'
+import { BaseModel, beforeFind, column } from '@adonisjs/lucid/orm'
+import { AccessTokenPermission, appPermissionsArraySchema, parsePermissionString } from './validators.js'
 import { parseJsonValidated } from '../../utils/validation.js'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
-import type { HasOne } from '@adonisjs/lucid/types/relations'
-import App from './App.js'
 
 export type PendingAppStatus = 'PENDING' | 'APPROVED' | 'DENIED'
 
@@ -15,13 +13,16 @@ export default class PendingApp extends BaseModel {
   declare id: number
 
   @column()
-  declare appId: number|null
+  declare accessTokenId: number|null
 
   @column()
   declare appName: string
 
   @column()
-  declare code: string
+  declare privateCode: string
+
+  @column()
+  declare publicCode: string
 
   /**
    * JSON array string of requested permissions.
@@ -39,14 +40,9 @@ export default class PendingApp extends BaseModel {
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
-  @hasOne(() => App, {
-    localKey: 'appId',
-    foreignKey: 'id',
-  })
-  declare app: HasOne<typeof App>
-
-  async requestedPermissionsArray() {
-    return await parseJsonValidated(appPermissionsArraySchema, this.requestedPermissions)
+  async requestedPermissionsArray(): Promise<AccessTokenPermission[]> {
+    const permissionArray = await parseJsonValidated(appPermissionsArraySchema, this.requestedPermissions);
+    return permissionArray.map(parsePermissionString);
   }
 
   @beforeFind()
