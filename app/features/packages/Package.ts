@@ -29,7 +29,7 @@ export default class Package extends BaseModel {
   declare updatedAt: DateTime
 
   @belongsTo(() => Scope, {
-    foreignKey: 'scope_id',
+    foreignKey: 'scopeId',
   })
   declare scope: BelongsTo<typeof Scope>
 
