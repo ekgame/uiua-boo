@@ -1,5 +1,5 @@
-import UserService from '#services/user_service';
-import { UserRole } from '#types/user_role';
+import UserService from '#features/users/UserService';
+import { UserRole } from '#features/users/UserRole';
 import { test } from '@japa/runner'
 
 test.group('user', () => {

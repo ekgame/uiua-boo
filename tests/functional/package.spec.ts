@@ -1,9 +1,9 @@
 import { test } from '@japa/runner';
-import ScopeService from '#services/scope_service';
-import UserService from '#services/user_service';
-import User from '#models/user';
-import Scope from '#models/scope';
-import PackageService from '#services/package_service';
+import ScopeService from '#features/scopes/ScopeService';
+import UserService from '#features/users/UserService';
+import User from '#features/users/User';
+import Scope from '#features/scopes/Scope';
+import PackageService from '#features/packages/PackageService';
 
 test.group('package', (group) => {
   let user1: User;

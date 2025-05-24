@@ -15,6 +15,7 @@
   },
   "imports": {
     "#exceptions/*": "./app/exceptions/*.js",
+    "#features/*": "./app/features/*.js",
     "#middleware/*": "./app/middleware/*.js",
     "#database/*": "./database/*.js",
     "#tests/*": "./tests/*.js",
