@@ -17,6 +17,8 @@ use flate2::write::GzEncoder;
 use glob::glob;
 use tar::Builder;
 
+use super::validate;
+
 enum PublishingIssueType {
     Error,
     Warning,
@@ -57,16 +59,6 @@ impl PublishingIssues {
             .any(|issue| matches!(issue.issue_type, PublishingIssueType::Error))
     }
 
-    fn has_warnings(&self) -> bool {
-        self.message
-            .iter()
-            .any(|issue| matches!(issue.issue_type, PublishingIssueType::Warning))
-    }
-
-    fn has_issues(&self) -> bool {
-        self.has_errors() || self.has_warnings()
-    }
-
     fn get_sorted_issues(&self) -> Vec<&PublishingIssue> {
         let mut sorted_issues = self.message.iter().collect::<Vec<_>>();
         sorted_issues.sort_by(|a, b| match (&a.issue_type, &b.issue_type) {
@@ -97,21 +89,43 @@ pub(crate) fn run_publish(args: PublishArgs) {
         }
     }
 
-    if args.check {
-        if !package_data.issues.has_issues() {
-            print_success("No issues found. Package is ready for publishing.");
-        }
-        return;
-    }
-
-    if package_data.issues.has_errors() {
-        process::exit(1);
-    }
-
     let package_buffer = create_package(&package_data.files).unwrap_or_else(|e| {
         print_error(&e);
         process::exit(1);
     });
+
+    let rules = validate::ValidationRules::new();
+    let validation_errors = validate::validate_package(&package_buffer, &rules);
+
+    if !validation_errors.is_empty() {
+        for error in validation_errors {
+            print_error(error.message.as_str());
+        }
+        process::exit(1);
+    }
+
+    let has_errors = package_data.issues.has_errors() || !validation_errors.is_empty();
+
+    if args.check {
+        if !has_errors {
+            print_success("No issues found. Package is ready for publishing.");
+        }
+        process::exit(has_errors as i32);
+    }
+
+    if has_errors{
+        process::exit(1);
+    }
+
+    if args.offline {
+        let output_file = format!("{}.tar.gz", package_data.package.package_file_name());
+        fs::write(&output_file, package_buffer).unwrap_or_else(|e| {
+            print_error(&format!("Failed to write package to file '{}': {}", output_file, e));
+            process::exit(1);
+        });
+        print_success(&format!("Package created successfully: '{}'", output_file));
+        process::exit(0);
+    }
 }
 
 fn validate_package() -> Result<PublishingData, String> {
@@ -153,18 +167,6 @@ fn validate_package() -> Result<PublishingData, String> {
             Ok(_) => issues.add_warning(format!("No files matched the pattern '{}'", pattern)),
             Err(e) => issues.add_error(format!("Invalid GLOB pattern '{}': {}", pattern, e)),
         }
-    }
-
-    let has_definition_file = files.contains(&PathBuf::from("boo.json"));
-    let has_lib_file = files.contains(&PathBuf::from("lib.ua"));
-    let has_main_file = files.contains(&PathBuf::from("main.ua"));
-
-    if !has_definition_file {
-        issues.add_error("Missing 'boo.json' file in the package.".to_string());
-    }
-
-    if !has_lib_file && !has_main_file {
-        issues.add_error("Missing 'lib.ua' or 'main.ua' file in the package.".to_string());
     }
 
     return Ok(PublishingData {

@@ -7,6 +7,12 @@ pub struct BooPackageDefinition {
     pub include: Vec<String>,
 }
 
+impl BooPackageDefinition {
+    pub fn package_file_name(&self) -> String {
+        format!("{}-{}", self.name.replace("/", "-"), self.version)
+    }
+} 
+
 pub fn validate_package_name(name: &String) -> Result<String, String> {
     if name.is_empty() {
         return Err("package name cannot be empty".to_string());

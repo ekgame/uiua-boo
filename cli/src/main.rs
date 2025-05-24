@@ -34,8 +34,10 @@ struct InitArgs {
 
 #[derive(Args, Debug)]
 struct PublishArgs {
-    #[clap(long)]
+    #[clap(long, help = "Only check is the package is ready for publishing, without uploading it.")]
     check: bool,
+    #[clap(long, help = "Output the package to a file instead of uploading it.")]
+    offline: bool,
 }
 
 #[derive(Args, Debug)]
