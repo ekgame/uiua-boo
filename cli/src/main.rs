@@ -5,6 +5,7 @@ pub mod common;
 mod commands {
     pub mod init;
     pub mod publish;
+    pub mod validate;
 }
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -20,6 +21,7 @@ struct Cli {
 enum Commands {
     Init(InitArgs),
     Publish(PublishArgs),
+    Validate(ValidationArgs),
     Docs,
     Version,
 }
@@ -36,11 +38,19 @@ struct PublishArgs {
     check: bool,
 }
 
+#[derive(Args, Debug)]
+struct ValidationArgs {
+    package_file: String,
+    #[clap(long)]
+    offline: bool,
+}
+
 fn main() {
     let cli = Cli::parse();
     match cli.command {
         Commands::Init(args) => commands::init::run_init(args),
         Commands::Publish(args) => commands::publish::run_publish(args),
+        Commands::Validate(args) => commands::validate::run_validation(args),
         Commands::Docs => {
             panic!("TODO: Implement docs command");
         }
