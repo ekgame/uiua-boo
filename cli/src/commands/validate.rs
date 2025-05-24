@@ -1,7 +1,7 @@
 use bytesize::ByteSize;
-use virtual_filesystem::{tar_fs::TarFS, FileSystem};
+use virtual_filesystem::{FileSystem, tar_fs::TarFS};
 
-use crate::{print_error, print_success, ValidationArgs};
+use crate::{ValidationArgs, print_error, print_success};
 
 pub struct ValidationRules {
     pub compressed_package_max_size: u64,
@@ -57,7 +57,9 @@ pub(crate) fn validate_package(buffer: &Vec<u8>, rules: &ValidationRules) -> Vec
     let decoder = flate2::read::GzDecoder::new(buffer.as_slice());
     let package = TarFS::new(decoder);
     if let Err(error) = package {
-        errors.push(ValidationError::new(format!("Failed to read the package: {error}")));
+        errors.push(ValidationError::new(format!(
+            "Failed to read the package: {error}"
+        )));
         return errors;
     }
 
@@ -72,8 +74,8 @@ pub(crate) fn validate_package(buffer: &Vec<u8>, rules: &ValidationRules) -> Vec
         Ok(false) => errors.push(ValidationError::new(
             "The package is missing the required 'boo.json' file.".to_string(),
         )),
-        Err(error) => errors.push(ValidationError::new(
-            format!("Failed to check for 'boo.json': {error}",
+        Err(error) => errors.push(ValidationError::new(format!(
+            "Failed to check for 'boo.json': {error}",
         ))),
     }
 
@@ -116,10 +118,7 @@ pub(crate) fn validate_package(buffer: &Vec<u8>, rules: &ValidationRules) -> Vec
     errors
 }
 
-fn validate_package_files(
-    rules: &ValidationRules,
-    fs: &TarFS,
-) -> Vec<ValidationError> {
+fn validate_package_files(rules: &ValidationRules, fs: &TarFS) -> Vec<ValidationError> {
     let mut errors = Vec::new();
 
     let entries = fs.read_dir("/");

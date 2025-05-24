@@ -113,14 +113,17 @@ pub(crate) fn run_publish(args: PublishArgs) {
         process::exit(has_errors as i32);
     }
 
-    if has_errors{
+    if has_errors {
         process::exit(1);
     }
 
     if args.offline {
         let output_file = format!("{}.tar.gz", package_data.package.package_file_name());
         fs::write(&output_file, package_buffer).unwrap_or_else(|e| {
-            print_error(&format!("Failed to write package to file '{}': {}", output_file, e));
+            print_error(&format!(
+                "Failed to write package to file '{}': {}",
+                output_file, e
+            ));
             process::exit(1);
         });
         print_success(&format!("Package created successfully: '{}'", output_file));
