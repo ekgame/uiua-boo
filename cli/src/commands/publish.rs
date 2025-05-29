@@ -299,7 +299,7 @@ fn do_publish(package: VerifiedPackage) -> Result<(), PublishingError> {
 
         println!("");
         println!("Please approve the application to act on your behalf:");
-        println!(" - {}", auth_request_response.request_url);
+        println!(" - {}", auth_request_response.request_url.underline());
         println!("");
         println!("{}", "Waiting for approval...".dimmed());
 
