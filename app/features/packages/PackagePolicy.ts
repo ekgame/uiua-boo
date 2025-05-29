@@ -12,7 +12,7 @@ export default class PackagePolicy extends BasePolicy {
     }
 
     // TODO: deny if the pack has versions
-    
+
     return AuthorizationResponse.allow();
   }
 
@@ -21,7 +21,7 @@ export default class PackagePolicy extends BasePolicy {
       return AuthorizationResponse.deny("You are not a member of this scope.");
     }
 
-    if (UserService.accessTokenHasPermission(user.currentAccessToken, {
+    if (!UserService.accessTokenHasPermission(user.currentAccessToken, {
         type: 'package.upload-new-version',
         scope: pack.scope.identifier,
         name: pack.name,

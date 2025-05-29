@@ -52,6 +52,11 @@ class UserService {
     return user;
   }
 
+  /**
+   * Checks if the user has the requested permission in their current access token.
+   * If no access token is present, it assumes that the user is not using API access
+   * and therefore has no restrictions.
+   */
   accessTokenHasPermission(
     accessToken: User['currentAccessToken'],
     requested: AccessTokenPermission
