@@ -58,6 +58,10 @@ router
     router.post('/auth/request', [AppController, 'apiRequestApp']).as('auth.new.request');
     router.delete('/auth/request/:code', [AppController, 'apiDeleteAppRequest']).as('auth.new.request.delete');
     router.get('/auth/request/:code', [AppController, 'apiPendingAppStatus']).as('auth.request.status');
+
+    router.group(() => {
+      router.post('/publish', [PublishController, 'apiSubmitPackage']).as('package.publish.api.submit');
+    }).use(middleware.auth({guards: ['api']}));
   })
   .use(middleware.json())
   .prefix('/api')

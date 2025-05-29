@@ -1,3 +1,4 @@
+import { AccessTokenPermission, parsePermissionString } from "#features/apps/validators";
 import User from "./User.js";
 import { UserRole } from "./UserRole.js";
 import logger from "@adonisjs/core/services/logger";
@@ -49,6 +50,45 @@ class UserService {
     }
 
     return user;
+  }
+
+  accessTokenHasPermission(
+    accessToken: User['currentAccessToken'],
+    requested: AccessTokenPermission
+  ): boolean {
+    if (!accessToken) {
+      return true;
+    }
+
+    const permissions = accessToken.abilities.map(parsePermissionString);
+    for (const perm of permissions) {
+      if (this.validatePermission(requested, perm)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private validatePermission(requested: AccessTokenPermission, available: AccessTokenPermission): boolean {
+    const isValidType = requested.type === available.type;
+    let isValidAction = true;
+
+    if (isValidType && available.type === 'package.upload-new-version') {
+      const a = requested as { scope: string, name?: string, version?: string};
+      const b = available as { scope: string, name?: string, version?: string};
+
+      const conditions = [
+        (b.scope && (!a.scope || a.scope !== b.scope)),
+        (b.name && (!a.name || a.name !== b.name)),
+        (b.version && (!a.version || a.version !== b.version)),
+      ];
+
+      // If any of the conditions are true, the action is not valid
+      isValidAction = !conditions.some(condition => condition);
+    }
+
+    return isValidType && isValidAction;
   }
 }
 

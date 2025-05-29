@@ -25,14 +25,14 @@ export const pendingAppSchema = vine.compile(
   }),
 );
 
-export type AccessTokenPermission = {
-  type: string;
-} | {
+export type AccessTokenPermission ={
   type: 'package.upload-new-version';
   scope: string;
   name?: string;
   version?: string;
-}
+} | {
+  type: string;
+};
 
 export function parsePermissionString(string: Infer<typeof appPermission>): AccessTokenPermission  {
   if (string.startsWith('package.upload-new-version:')) {

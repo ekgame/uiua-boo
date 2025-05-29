@@ -1,9 +1,9 @@
 import PendingApp from "./PendingApp.js";
 import { appPermissionsArraySchema, pendingAppSchema } from "./validators.js";
 import { Infer } from "@vinejs/vine/types";
-import { randomUUID } from "crypto";
 import { DateTime, Duration } from "luxon";
 import User from "../users/User.js";
+import { cuid } from "@adonisjs/core/helpers";
 
 class AppService {
   async createPendingApp(
@@ -31,7 +31,7 @@ class AppService {
     let code: string;
 
     do {
-      code = randomUUID();
+      code = cuid();
     } while (await PendingApp.findBy(key, code));
 
     return code;

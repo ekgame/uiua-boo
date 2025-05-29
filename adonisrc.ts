@@ -48,7 +48,8 @@ export default defineConfig({
       file: () => import('adonisjs-scheduler/scheduler_provider'),
       environment: ['web', 'console'],
     },
-    () => import('adonisjs-jobs/jobs_provider')
+    () => import('adonisjs-jobs/jobs_provider'),
+    () => import('@adonisjs/drive/drive_provider')
   ],
 
   /*

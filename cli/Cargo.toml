@@ -13,9 +13,8 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.140"
 flate2 = "1.1.1"
 tar = "0.4.44"
-uuid = { version = "1.16.0", features = ["v4"] }
 bytesize = "2.0.1"
 virtual-filesystem = "0.2.1"
 reqwest = { version = "0.12.15", features = ["json"] }
-tokio   = { version = "1.45.1", features = ["rt-multi-thread", "macros"] }
+tokio = { version = "1.45.1", features = ["rt-multi-thread", "macros"] }
 urlencoding = "2.1.3"

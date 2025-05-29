@@ -69,6 +69,19 @@ pub struct AuthRequestDeleteResponse {
     status: String,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PublishPackageRequest {
+    pub scope: String,
+    pub name: String,
+    pub version: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PublishPackageResponse {
+    pub message: String,
+    pub job_id: String,
+}
+
 impl BooApiClient {
     pub fn new() -> Self {
         let base_url = std::env::var("BOO_API_URL").unwrap_or_else(|_| DEFAULT_API_URL.to_string());
@@ -90,6 +103,11 @@ impl BooApiClient {
 
     pub fn set_access_token(&mut self, token: String) {
         self.access_token = Some(token);
+    }
+
+    fn get_access_token(&self) -> Result<String, ApiRequestError> {
+        self.access_token.clone()
+            .ok_or(ApiRequestError::ApiError("Missing access token".to_string()))
     }
 
     async fn parse_response<T>(
@@ -148,6 +166,19 @@ impl BooApiClient {
         let encoded_code = urlencoding::encode(private_code);
         let url = format!("{}auth/request/{}", self.base_url, encoded_code);
         let response_result = self.client.delete(&url).send().await;
+        Self::parse_response(response_result).await
+    }
+
+    pub async fn publish_package(
+        &self,
+        request: PublishPackageRequest,
+    ) -> Result<PublishPackageResponse, ApiRequestError> {
+        let url = format!("{}packages/publish", self.base_url);
+        let response_result = self.client.post(&url)
+            .header("Authorization", format!("Bearer {}", self.get_access_token()?))
+            .json(&request)
+            .send()
+            .await;
         Self::parse_response(response_result).await
     }
 }

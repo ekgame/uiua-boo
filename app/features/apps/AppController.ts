@@ -34,19 +34,19 @@ export default class AppController {
     return response.redirect().back();
   }
 
-  async apiRequestApp({ request }: HttpContext) {
+  async apiRequestApp({ request, response }: HttpContext) {
     const { app_name, requested_permissions } = request.body();
     const pendingApp = await AppService.createPendingApp(app_name, requested_permissions);
     
-    return {
+    return response.created({
       private_code: pendingApp.privateCode,
       public_code: pendingApp.publicCode,
       expires_at: pendingApp.expiresAt.toISO(),
       request_url: makeAbsoluteUrl('auth.request.view', { code: pendingApp.publicCode }),
-    };
+    });
   }
 
-  async apiPendingAppStatus({ params }: HttpContext) {
+  async apiPendingAppStatus({ params, response }: HttpContext) {
     const pendingApp = await PendingApp.findByOrFail('private_code', params.code);
     let token = null;
 
@@ -54,17 +54,17 @@ export default class AppController {
       token = pendingApp.accessToken;
     }
 
-    return {
+    return response.ok({
       status: pendingApp.status,
       expires_at: pendingApp.expiresAt.toISO(),
       requested_permissions: await pendingApp.requestedPermissionsArray(),
       access_token: token,
-    };
+    });
   }
 
-  async apiDeleteAppRequest({ params }: HttpContext) {
+  async apiDeleteAppRequest({ params, response }: HttpContext) {
     const pendingApp = await PendingApp.findByOrFail('private_code', params.code);
     await pendingApp.delete();
-    return { status: 'ok' };
+    return response.ok({ status: 'ok' });
   }
 }
