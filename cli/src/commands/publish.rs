@@ -12,7 +12,7 @@ use owo_colors::OwoColorize;
 
 use crate::{
     PublishArgs,
-    api::{ApiRequestError, AuthRequest, AuthRequestStatus, BooApiClient},
+    api::{ApiRequestError, AuthRequest, AuthRequestResponse, AuthRequestStatus, BooApiClient},
     common::{BooPackageDefinition, validate_package_name},
     print_error, print_success, print_warning,
 };
@@ -303,60 +303,53 @@ fn do_publish(package: VerifiedPackage) -> Result<(), PublishingError> {
         println!("");
         println!("{}", "Waiting for approval...".dimmed());
 
-        let start_time = std::time::Instant::now();
+        let access_token = run_auth_verification_loop(&client, &auth_request_response).await;
 
-        loop {
-            if start_time.elapsed().as_secs() > AUTH_TIMEOUT_SECS {
-                client
-                    .delete_auth_request(&auth_request_response.private_code)
-                    .await
-                    .ok();
-                return Err(PublishingError::ApiError(
-                    "Authorization request timed out".to_string(),
-                ));
-            }
+        client
+            .delete_auth_request(&auth_request_response.private_code)
+            .await
+            .map_err(|e| PublishingError::from(&e))?;
 
-            sleep(Duration::from_secs(POLLING_INTERVAL_SECS)).await;
-
-            let request_status = client
-                .get_auth_request_status(&auth_request_response.private_code)
-                .await
-                .map_err(|e| PublishingError::from(&e))?;
-
-            match &request_status.status {
-                AuthRequestStatus::Pending => {
-                    continue;
-                }
-                AuthRequestStatus::Approved => {
-                    match request_status.access_token {
-                        Some(token) => {
-                            client.set_access_token(token);
-                            print_success("Application approved. Proceeding with publishing...");
-                        }
-                        None => {
-                            client
-                                .delete_auth_request(&auth_request_response.private_code)
-                                .await
-                                .map_err(|e| PublishingError::from(&e))?;
-
-                            return Err(PublishingError::ApiError(
-                                "No access token provided in the approval response.".to_string(),
-                            ));
-                        }
-                    }
-                    break;
-                }
-                AuthRequestStatus::Denied => {
-                    client
-                        .delete_auth_request(&auth_request_response.private_code)
-                        .await
-                        .map_err(|e| PublishingError::from(&e))?;
-
-                    return Err(PublishingError::AppRequestDenied);
-                }
-            }
-        }
+        client.set_access_token(access_token?);
+        print_success("Authorization approved, uploading...");
 
         Ok(())
     })
+}
+
+async fn run_auth_verification_loop(
+    client: &BooApiClient,
+    auth_request_response: &AuthRequestResponse,
+) -> Result<String, PublishingError> {
+    let start_time = std::time::Instant::now();
+
+    loop {
+        if start_time.elapsed().as_secs() > AUTH_TIMEOUT_SECS {
+            return Err(PublishingError::ApiError(
+                "Authorization request timed out".to_string(),
+            ));
+        }
+
+        sleep(Duration::from_secs(POLLING_INTERVAL_SECS)).await;
+
+        let request_status = client
+            .get_auth_request_status(&auth_request_response.private_code)
+            .await
+            .map_err(|e| PublishingError::from(&e))?;
+
+        match &request_status.status {
+            AuthRequestStatus::Pending => {
+                continue;
+            }
+            AuthRequestStatus::Approved => match request_status.access_token {
+                Some(token) => return Ok(token),
+                None => {
+                    return Err(PublishingError::ApiError(
+                        "No access token provided in the approval response.".to_string(),
+                    ));
+                }
+            },
+            AuthRequestStatus::Denied => return Err(PublishingError::AppRequestDenied),
+        }
+    }
 }
