@@ -4,10 +4,15 @@ use std::{
     fs,
     path::{self, PathBuf},
     process,
+    time::Duration,
+    vec,
 };
+
+use owo_colors::OwoColorize;
 
 use crate::{
     PublishArgs,
+    api::{ApiRequestError, AuthRequest, AuthRequestStatus, BooApiClient},
     common::{BooPackageDefinition, validate_package_name},
     print_error, print_success, print_warning,
 };
@@ -16,8 +21,12 @@ use flate2::Compression;
 use flate2::write::GzEncoder;
 use glob::glob;
 use tar::Builder;
+use tokio::time::sleep;
 
 use super::validate;
+
+const POLLING_INTERVAL_SECS: u64 = 1;
+const AUTH_TIMEOUT_SECS: u64 = 300; // 5 minutes
 
 enum PublishingIssueType {
     Error,
@@ -76,6 +85,39 @@ struct PublishingData {
     files: Vec<PathBuf>,
 }
 
+struct VerifiedPackage {
+    package: BooPackageDefinition,
+    buffer: Vec<u8>,
+}
+
+enum PublishingError {
+    AppRequestDenied,
+    ApiError(String),
+    NetworkError(String),
+}
+
+impl From<&ApiRequestError> for PublishingError {
+    fn from(error: &ApiRequestError) -> Self {
+        match error {
+            ApiRequestError::ApiError(message) => PublishingError::ApiError(message.clone()),
+            ApiRequestError::NetworkError(message) => {
+                PublishingError::NetworkError(message.clone())
+            }
+            ApiRequestError::ValidationErrors(error) => PublishingError::ApiError(
+                error
+                    .errors
+                    .iter()
+                    .map(|e| format!("{} - {}", e.field, e.message))
+                    .collect::<Vec<_>>()
+                    .join(", "),
+            ),
+            ApiRequestError::ResponseFormatError(message) => {
+                PublishingError::ApiError(message.clone())
+            }
+        }
+    }
+}
+
 pub(crate) fn run_publish(args: PublishArgs) {
     let package_data = validate_package().unwrap_or_else(|e| {
         print_error(&e);
@@ -128,6 +170,26 @@ pub(crate) fn run_publish(args: PublishArgs) {
         });
         print_success(&format!("Package created successfully: '{}'", output_file));
         process::exit(0);
+    }
+
+    let status = do_publish(VerifiedPackage {
+        package: package_data.package,
+        buffer: package_buffer,
+    });
+
+    match status {
+        Ok(_) => {
+            print_success("Package published successfully.");
+        }
+        Err(PublishingError::AppRequestDenied) => {
+            print_error("App request was denied, stopping.");
+        }
+        Err(PublishingError::NetworkError(message)) => {
+            print_error(&format!("Network error: {}", message));
+        }
+        Err(PublishingError::ApiError(message)) => {
+            print_error(&format!("API error: {}", message));
+        }
     }
 }
 
@@ -215,4 +277,86 @@ fn create_package(files: &[PathBuf]) -> Result<Vec<u8>, String> {
         .map_err(|e| format!("Failed to finish compression: {}", e))?;
 
     Ok(buffer)
+}
+
+fn do_publish(package: VerifiedPackage) -> Result<(), PublishingError> {
+    let mut client = BooApiClient::new();
+
+    let rt = tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime");
+    rt.block_on(async {
+        let auth_request = AuthRequest {
+            app_name: client.app_name.clone(),
+            requested_permissions: vec![format!(
+                "package.upload-new-version:{}@{}",
+                package.package.name, package.package.version
+            )],
+        };
+
+        let auth_request_response = client
+            .create_auth_request(auth_request)
+            .await
+            .map_err(|e| PublishingError::from(&e))?;
+
+        println!("");
+        println!("Please approve the application to act on your behalf:");
+        println!(" - {}", auth_request_response.request_url);
+        println!("");
+        println!("{}", "Waiting for approval...".dimmed());
+
+        let start_time = std::time::Instant::now();
+
+        loop {
+            if start_time.elapsed().as_secs() > AUTH_TIMEOUT_SECS {
+                client
+                    .delete_auth_request(&auth_request_response.private_code)
+                    .await
+                    .ok();
+                return Err(PublishingError::ApiError(
+                    "Authorization request timed out".to_string(),
+                ));
+            }
+
+            sleep(Duration::from_secs(POLLING_INTERVAL_SECS)).await;
+
+            let request_status = client
+                .get_auth_request_status(&auth_request_response.private_code)
+                .await
+                .map_err(|e| PublishingError::from(&e))?;
+
+            match &request_status.status {
+                AuthRequestStatus::Pending => {
+                    continue;
+                }
+                AuthRequestStatus::Approved => {
+                    match request_status.access_token {
+                        Some(token) => {
+                            client.set_access_token(token);
+                            print_success("Application approved. Proceeding with publishing...");
+                        }
+                        None => {
+                            client
+                                .delete_auth_request(&auth_request_response.private_code)
+                                .await
+                                .map_err(|e| PublishingError::from(&e))?;
+
+                            return Err(PublishingError::ApiError(
+                                "No access token provided in the approval response.".to_string(),
+                            ));
+                        }
+                    }
+                    break;
+                }
+                AuthRequestStatus::Denied => {
+                    client
+                        .delete_auth_request(&auth_request_response.private_code)
+                        .await
+                        .map_err(|e| PublishingError::from(&e))?;
+
+                    return Err(PublishingError::AppRequestDenied);
+                }
+            }
+        }
+
+        Ok(())
+    })
 }

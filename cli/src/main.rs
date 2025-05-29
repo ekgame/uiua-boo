@@ -2,6 +2,7 @@ use clap::{Args, Parser, Subcommand};
 use owo_colors::OwoColorize;
 
 pub mod common;
+pub mod api;
 mod commands {
     pub mod init;
     pub mod publish;

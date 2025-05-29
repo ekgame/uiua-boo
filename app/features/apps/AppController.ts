@@ -58,10 +58,7 @@ export default class AppController {
       status: pendingApp.status,
       expires_at: pendingApp.expiresAt.toISO(),
       requested_permissions: await pendingApp.requestedPermissionsArray(),
-      access_token: !token ? null : {
-        type: 'Bearer',
-        token: token,
-      },
+      access_token: token,
     };
   }
 
