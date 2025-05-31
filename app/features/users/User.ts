@@ -4,7 +4,6 @@ import type { ManyToMany } from '@adonisjs/lucid/types/relations';
 import Scope from '../scopes/Scope.js';
 import type { UserRole } from './UserRole.js';
 import { AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
-import { AccessTokenPermission, parsePermissionString } from '#features/apps/validators';
 
 export default class User extends BaseModel {
   static table = 'user';

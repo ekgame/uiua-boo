@@ -65,6 +65,7 @@
     "edge-iconify": "^2.0.1",
     "edge.js": "^6.2.1",
     "luxon": "^3.6.1",
+    "normalize-exception": "^4.0.1",
     "reflect-metadata": "^0.2.2",
     "semver": "^7.7.2",
     "tailwindcss": "^4.1.4",

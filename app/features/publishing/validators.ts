@@ -19,4 +19,3 @@ export const publishPackageValidator = vine.compile(
     version: vine.string().use(isSemver()).transform(t => semver.parse(t)!),
   }),
 );
-
