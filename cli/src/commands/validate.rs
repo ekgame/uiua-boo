@@ -55,9 +55,16 @@ pub(crate) fn run_validation(args: ValidationArgs) {
 
     let package_file = args.package_file;
 
-    let buffer = std::fs::read(&package_file).expect("Failed to read the package file");
-    let results = validate_package(&buffer, &rules);
-
+    let results = match std::fs::read(&package_file) {
+        Ok(buffer) => validate_package(&buffer, &rules),
+        Err(error) => vec![
+            ValidationError::new(format!(
+                "Failed to read package file '{}': {error}",
+                package_file
+            ))
+        ],
+    };
+    
     if args.json {
         let json_results = serde_json::to_string(&results).expect("Failed to serialize results to JSON");
         println!("{}", json_results);
