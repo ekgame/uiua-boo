@@ -47,8 +47,12 @@ struct PublishArgs {
 #[derive(Args, Debug)]
 struct ValidationArgs {
     package_file: String,
-    #[clap(long)]
-    offline: bool,
+    #[clap(long, help = "Expected package name for validation.")]
+    expect_name: Option<String>,
+    #[clap(long, help = "Expected package version for validation.")]
+    expect_version: Option<String>,
+    #[clap(long, help = "Print validation results in JSON format.")]
+    json: bool, 
 }
 
 fn main() {

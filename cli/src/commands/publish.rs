@@ -13,7 +13,7 @@ use owo_colors::OwoColorize;
 use crate::{
     PublishArgs,
     api::{ApiRequestError, AuthRequest, AuthRequestResponse, AuthRequestStatus, BooApiClient},
-    common::{BooPackageDefinition, validate_package_name},
+    common::BooPackageDefinition,
     print_error, print_success, print_warning,
 };
 
@@ -207,18 +207,8 @@ fn validate_package() -> Result<PublishingData, String> {
 
     let mut issues = PublishingIssues::new();
 
-    if let Err(message) = validate_package_name(&package_definition.name) {
-        issues.add_error(format!(
-            "Invalid package name '{}': {}",
-            package_definition.name, message
-        ));
-    }
-
-    if let Err(message) = semver::Version::parse(&package_definition.version) {
-        issues.add_error(format!(
-            "Invalid package version '{}': {}",
-            package_definition.version, message
-        ));
+    for error in validate::validate_package_definition(&package_definition) {
+        issues.add_error(error.message);
     }
 
     let mut files: HashSet<PathBuf> = HashSet::new();
