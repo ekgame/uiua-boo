@@ -30,6 +30,7 @@ export type AccessTokenPermission ={
   scope: string;
   name?: string;
   version?: string;
+  allowAnyVersion?: boolean;
 } | {
   type: string;
 };

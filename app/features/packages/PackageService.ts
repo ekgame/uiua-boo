@@ -15,7 +15,7 @@ class PackageService {
       scopeId: scope.id,
     });
 
-    logger.info(`Package created: ${newPackage.identifier}`);
+    logger.info(`Package created: ${newPackage.reference}`);
 
     return newPackage;
   }

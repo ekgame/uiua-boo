@@ -34,7 +34,7 @@ export default class Scope extends BaseModel {
   declare packages: HasMany<typeof Package>;
 
   @computed()
-  get identifier() {
+  get reference() {
     return `@${this.name}`;
   }
 }

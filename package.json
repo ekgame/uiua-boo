@@ -17,6 +17,7 @@
     "#exceptions/*": "./app/exceptions/*.js",
     "#features/*": "./app/features/*.js",
     "#middleware/*": "./app/middleware/*.js",
+    "#jobs/*": "./app/jobs/*.js",
     "#database/*": "./database/*.js",
     "#tests/*": "./tests/*.js",
     "#start/*": "./start/*.js",

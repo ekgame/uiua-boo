@@ -76,7 +76,7 @@ pub(crate) fn run_validation(args: ValidationArgs) {
     } else {
         print_error("Package validation failed:");
         for error in results {
-            print_error(&format!(" - {}", error.message));
+            print_error(&format!("- {}", error.message));
         }
     }
 }

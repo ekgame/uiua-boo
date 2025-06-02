@@ -60,7 +60,9 @@ router
     router.get('/auth/request/:code', [AppController, 'apiPendingAppStatus']).as('auth.request.status');
 
     router.group(() => {
-      router.post('/publish', [PublishController, 'apiSubmitPackage']).as('package.publish.api.submit');
+      router.post('/publish', [PublishController, 'apiCreatePublishJob']).as('package.publish.api.submit');
+      router.post('/publish/:jobId/upload', [PublishController, 'apiUploadArchive']).as('package.publish.api.upload');
+      router.get('/publish/:jobId', [PublishController, 'apiPublishJobStatus']).as('package.publish.api.status');
     }).use(middleware.auth({guards: ['api']}));
   })
   .use(middleware.json())

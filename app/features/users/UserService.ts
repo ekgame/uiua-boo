@@ -80,13 +80,13 @@ class UserService {
     let isValidAction = true;
 
     if (isValidType && available.type === 'package.upload-new-version') {
-      const a = requested as { scope: string, name?: string, version?: string};
+      const a = requested as { scope: string, name?: string, version?: string, allowAnyVersion?: boolean };
       const b = available as { scope: string, name?: string, version?: string};
 
       const conditions = [
         (b.scope && (!a.scope || a.scope !== b.scope)),
         (b.name && (!a.name || a.name !== b.name)),
-        (b.version && (!a.version || a.version !== b.version)),
+        (!a.allowAnyVersion && b.version && (!a.version || a.version !== b.version)),
       ];
 
       // If any of the conditions are true, the action is not valid

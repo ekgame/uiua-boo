@@ -34,8 +34,8 @@ export default class Package extends BaseModel {
   declare scope: BelongsTo<typeof Scope>
 
   @computed()
-  get identifier() {
-    return `${this.scope.identifier}/${this.name}`;
+  get reference() {
+    return `${this.scope.reference}/${this.name}`;
   }
 
   @afterCreate()

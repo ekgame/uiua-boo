@@ -1,12 +1,12 @@
 import { Job } from "adonisjs-jobs";
-import PackagePublishJobModel from "./PackagePublishJobModel.js";
+import PackagePublishJobModel from "#features/publishing/PackagePublishJobModel";
 import normalizeException from 'normalize-exception';
 
 type PackagePublishJobPayload = {
   publishingJobId: number;
 };
 
-export class PackagePublishJob extends Job {
+export default class PackagePublishJob extends Job {
   public async handle(payload: PackagePublishJobPayload) {
     const job = await PackagePublishJobModel.findOrFail(payload.publishingJobId);
   

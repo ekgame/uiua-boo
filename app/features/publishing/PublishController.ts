@@ -4,11 +4,9 @@ import PackageService from '../packages/PackageService.js';
 import PublishService from './PublishService.js';
 import { cuid } from '@adonisjs/core/helpers';
 import PackagePublishJobModel, { PackagePublishJobStatus } from './PackagePublishJobModel.js';
-import Package from '#features/packages/Package';
-import Scope from '#features/scopes/Scope';
 import PackagePolicy from '#features/packages/PackagePolicy';
 import { Bouncer } from '@adonisjs/bouncer';
-import { PackagePublishJob } from './PackagePublishJob.js';
+import PackagePublishJob from '#jobs/PackagePublishJob';
 
 export default class PublishController {
   async scopeForm({ view, auth }: HttpContext) {
@@ -55,7 +53,7 @@ export default class PublishController {
     );
     
     return response.redirect().toRoute('package.init', {
-      scope: selectedScope.identifier,
+      scope: selectedScope.reference,
       name: pack.name,
     });
   }
@@ -73,21 +71,17 @@ export default class PublishController {
       status: PackagePublishJobStatus.PENDING,
     });
 
-    return response.created({
-      message: 'Successfully created a publishing job.',
-      publishing_id: job.id,
-    });
+    return response.created(await this.presentPublishingJob(job));
   }
 
-  async apiUploadArchive({ request, response, auth }: HttpContext) {
+  async apiUploadArchive({ request, response, auth, params }: HttpContext) {
     const user = auth.getUserOrFail();
-    const jobId = request.input('publishing_id');
-    const job = await PackagePublishJobModel.findOrFail(jobId);
-    const jobPackage = await Package.findOrFail(job.packageId);
+    const job = await PackagePublishJobModel.findOrFail(params.jobId);
+    await job.loadOnce('relatedPackage');
     
     await new Bouncer(user)
       .with(PackagePolicy)
-      .authorize('publish', jobPackage);
+      .authorize('publish', job.relatedPackage);
 
     if (job.status !== PackagePublishJobStatus.PENDING) {
       return response.badRequest({
@@ -96,7 +90,7 @@ export default class PublishController {
     }
 
     const archiveFile = request.file('archive', {
-      extnames: ['tgz', 'tar.gz'],
+      extnames: ['tar.gz'],
       size: '5mb',
     });
 
@@ -114,9 +108,31 @@ export default class PublishController {
       publishingJobId: job.id,
     });
 
-    return response.ok({
-      message: 'Archive uploaded successfully, publishing job started.',
+    return response.ok(await this.presentPublishingJob(job));
+  }
+
+  async apiPublishJobStatus({ response, auth, params }: HttpContext) {
+    const user = auth.getUserOrFail();
+    const job = await PackagePublishJobModel.findOrFail(params.jobId);
+    await job.loadOnce('relatedPackage');
+
+    await new Bouncer(user)
+      .with(PackagePolicy)
+      .authorize('publish', job.relatedPackage);
+
+    return response.ok(await this.presentPublishingJob(job));
+  }
+
+  private async presentPublishingJob(job: PackagePublishJobModel) {
+    await job.loadOnce('relatedPackage');
+
+    return {
       publishing_id: job.id,
-    });
+      package_scope: job.relatedPackage.scope.name,
+      package_name: job.relatedPackage.name,
+      publishing_version: job.version,
+      status: job.status,
+      result: job.result ? JSON.parse(job.result) : null,
+    };
   }
 }

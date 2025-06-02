@@ -21,7 +21,7 @@ export default class PackageController {
     
     if (await bouncer.with(PackagePolicy).denies('init', pack)) {
       return response.redirect().toRoute('package.show', {
-        scope: pack.scope.identifier,
+        scope: pack.scope.reference,
         name: pack.name,
       });
     }

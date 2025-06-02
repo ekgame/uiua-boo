@@ -56,6 +56,8 @@ struct ValidationArgs {
 }
 
 fn main() {
+    env_logger::init();
+    
     let cli = Cli::parse();
     match cli.command {
         Commands::Init(args) => commands::init::run_init(args),

@@ -1,20 +1,11 @@
 use std::{
-    cmp,
-    collections::HashSet,
-    fs,
-    path::{self, PathBuf},
-    process,
-    time::Duration,
-    vec,
+    cmp, collections::HashSet, error::Error, fs, path::{self, PathBuf}, process, time::Duration, vec
 };
 
 use owo_colors::OwoColorize;
 
 use crate::{
-    PublishArgs,
-    api::{ApiRequestError, AuthRequest, AuthRequestResponse, AuthRequestStatus, BooApiClient},
-    common::BooPackageDefinition,
-    print_error, print_success, print_warning,
+    api::{ApiRequestError, AuthRequest, AuthRequestResponse, AuthRequestStatus, BooApiClient, CreatePublishJobRequest, PackagePublishJobStatus}, common::BooPackageDefinition, print_error, print_success, print_warning, PublishArgs
 };
 
 use flate2::Compression;
@@ -27,6 +18,7 @@ use super::validate;
 
 const POLLING_INTERVAL_SECS: u64 = 1;
 const AUTH_TIMEOUT_SECS: u64 = 300; // 5 minutes
+const PUBLISH_JOB_WAIT_TIMEOUT_SECS: u64 = 600; // 10 minutes
 
 enum PublishingIssueType {
     Error,
@@ -92,26 +84,34 @@ struct VerifiedPackage {
 
 enum PublishingError {
     AppRequestDenied,
+    PublishJobErrors(Vec<String>),
     ApiError(String),
     NetworkError(String),
 }
 
 impl From<&ApiRequestError> for PublishingError {
-    fn from(error: &ApiRequestError) -> Self {
-        match error {
+    fn from(err: &ApiRequestError) -> Self {
+        match err {
             ApiRequestError::ApiError(message) => PublishingError::ApiError(message.clone()),
-            ApiRequestError::NetworkError(message) => {
-                PublishingError::NetworkError(message.clone())
+            ApiRequestError::NetworkError(err) => {
+                let mut error_message = err.to_string();
+                if let Some(source) = err.source() {
+                    error_message += &format!(": {}", source);
+                }
+                PublishingError::NetworkError(error_message)
             }
             ApiRequestError::ValidationErrors(error) => PublishingError::ApiError(
                 error
                     .errors
                     .iter()
-                    .map(|e| format!("{} - {}", e.field, e.message))
+                    .map(|e| match &e.field {
+                        Some(field) => format!("{}: {}", field, e.message),
+                        None => e.message.clone(),
+                    })
                     .collect::<Vec<_>>()
                     .join(", "),
             ),
-            ApiRequestError::ResponseFormatError(message) => {
+            ApiRequestError::AuthError(message) => {
                 PublishingError::ApiError(message.clone())
             }
         }
@@ -189,6 +189,12 @@ pub(crate) fn run_publish(args: PublishArgs) {
         }
         Err(PublishingError::ApiError(message)) => {
             print_error(&format!("API error: {}", message));
+        }
+        Err(PublishingError::PublishJobErrors(errors)) => {
+            print_error("Publishing job failed:");
+            for error in &errors {
+                print_error(format!("- {}", error).as_str());
+            }
         }
     }
 }
@@ -289,7 +295,7 @@ fn do_publish(package: VerifiedPackage) -> Result<(), PublishingError> {
 
         println!("");
         println!("Please approve the application to act on your behalf:");
-        println!(" - {}", auth_request_response.request_url.underline());
+        println!("- {}", auth_request_response.request_url.underline());
         println!("");
         println!("{}", "Waiting for approval...".dimmed());
 
@@ -300,8 +306,29 @@ fn do_publish(package: VerifiedPackage) -> Result<(), PublishingError> {
             .await
             .map_err(|e| PublishingError::from(&e))?;
 
+        print_success("Authorization approved");
         client.set_access_token(access_token?);
-        print_success("Authorization approved, uploading...");
+
+        print_success("Creating publishing job...");
+        let publish_job = client
+            .create_publishing_job(CreatePublishJobRequest {
+                scope: package.package.scope(),
+                name: package.package.package_name(),
+                version: package.package.version.clone(),
+            })
+            .await
+            .map_err(|e| PublishingError::from(&e))?;
+
+        print_success("Uploading package...");
+        client
+            .upload_package(&publish_job.publishing_id, package.buffer)
+            .await
+            .map_err(|e| PublishingError::from(&e))?;
+
+        print_success("Package uploaded successfully, waiting for publishing job to complete...");
+
+        run_check_publish_job_status_loop(&client, publish_job.publishing_id)
+            .await?;
 
         Ok(())
     })
@@ -340,6 +367,37 @@ async fn run_auth_verification_loop(
                 }
             },
             AuthRequestStatus::Denied => return Err(PublishingError::AppRequestDenied),
+        }
+    }
+}
+
+async fn run_check_publish_job_status_loop(client: &BooApiClient, publishing_id: i64) -> Result<(), PublishingError> {
+    
+    let start_time = std::time::Instant::now();
+
+    loop {
+        if start_time.elapsed().as_secs() > PUBLISH_JOB_WAIT_TIMEOUT_SECS {
+            return Err(PublishingError::ApiError(
+                "Publishing job timed out".to_string(),
+            ));
+        }
+
+        sleep(Duration::from_secs(POLLING_INTERVAL_SECS)).await;
+
+        let publish_job = client.get_publish_job_status(publishing_id)
+            .await
+            .map_err(|e| PublishingError::from(&e))?;
+
+        match publish_job.status {
+            PackagePublishJobStatus::Completed => {
+                return Ok(());
+            }
+            PackagePublishJobStatus::Failed => {
+                return Err(PublishingError::PublishJobErrors(vec![
+                    "TODO: get errors".to_string(),
+                ]));
+            }
+            _ => continue,
         }
     }
 }

@@ -23,7 +23,7 @@ class PublishService {
 
     await new Bouncer(user)
       .with(PackagePolicy)
-      .authorize('publish', targetPackage);
+      .authorize('publishVersion', targetPackage, data.version);
 
     // TODO: check if this or newer version already exists
 

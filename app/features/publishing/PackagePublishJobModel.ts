@@ -1,4 +1,6 @@
-import { BaseModel, column } from "@adonisjs/lucid/orm";
+import Package from "#features/packages/Package";
+import { BaseModel, belongsTo, column } from "@adonisjs/lucid/orm";
+import type { BelongsTo } from "@adonisjs/lucid/types/relations";
 import { DateTime } from 'luxon'
 
 export namespace PackagePublishJobStatus {
@@ -65,6 +67,11 @@ export default class PackagePublishJobModel extends BaseModel {
 
   @column.dateTime()
   declare processingStartedAt: DateTime | null
+
+  @belongsTo(() => Package, {
+    foreignKey: 'packageId',
+  })
+  declare relatedPackage: BelongsTo<typeof Package>
 
   async updateQueued(archiveFileName: string) {
     this.status = PackagePublishJobStatus.QUEUED;
