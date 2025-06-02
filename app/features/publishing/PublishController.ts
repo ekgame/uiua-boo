@@ -102,11 +102,12 @@ export default class PublishController {
 
     const archiveFileName = `${cuid()}.${archiveFile.extname}`;
     await archiveFile.moveToDisk(archiveFileName, 'fs');
-    await job.updateQueued(archiveFileName);
 
     await PackagePublishJob.dispatch({
       publishingJobId: job.id,
-    });
+    }, { delay: 100 });
+
+    await job.updateQueued(archiveFileName);
 
     return response.ok(await this.presentPublishingJob(job));
   }
