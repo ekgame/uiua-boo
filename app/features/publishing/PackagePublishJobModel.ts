@@ -28,7 +28,11 @@ interface PackagePublishJobSuccess {
 
 interface PackagePublishJobFailure {
   type: 'failure';
-  errors: string[];
+  errors: PackagePublishError[];
+}
+
+interface PackagePublishError {
+  message: string;
 }
 
 export type PackagePublishJobResult =
@@ -93,7 +97,7 @@ export default class PackagePublishJobModel extends BaseModel {
     return await this.save();
   }
 
-  async updateFailed(errors: string[]) {
+  async updateFailed(errors: PackagePublishError[]) {
     this.status = PackagePublishJobStatus.FAILED;
     this.result = JSON.stringify({
       type: 'failure',

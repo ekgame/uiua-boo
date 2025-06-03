@@ -35,7 +35,12 @@ export default class Package extends BaseModel {
 
   @computed()
   get reference() {
-    return `${this.scope.reference}/${this.name}`;
+    return `@${this.fullName}`;
+  }
+
+  @computed()
+  get fullName() {
+    return `${this.scope.name}/${this.name}`;
   }
 
   @afterCreate()

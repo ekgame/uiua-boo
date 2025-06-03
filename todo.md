@@ -4,3 +4,4 @@
 - [ ] Add limit to how many scopes you can create
 - [ ] Add a limit to how many packages you can create
 - [ ] Add a limit to how many versions can be published
+- [ ] Add license

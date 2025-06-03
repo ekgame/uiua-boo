@@ -2,11 +2,11 @@ import type { HttpContext } from '@adonisjs/core/http';
 import ScopeService from '../scopes/ScopeService.js';
 import PackageService from '../packages/PackageService.js';
 import PublishService from './PublishService.js';
-import { cuid } from '@adonisjs/core/helpers';
 import PackagePublishJobModel, { PackagePublishJobStatus } from './PackagePublishJobModel.js';
 import PackagePolicy from '#features/packages/PackagePolicy';
 import { Bouncer } from '@adonisjs/bouncer';
 import PackagePublishJob from '#jobs/PackagePublishJob';
+import { generatePendingPackageArchiveFileKey } from '../../utils/files.js';
 
 export default class PublishController {
   async scopeForm({ view, auth }: HttpContext) {
@@ -100,7 +100,7 @@ export default class PublishController {
       });
     }
 
-    const archiveFileName = `${cuid()}.${archiveFile.extname}`;
+    const archiveFileName = generatePendingPackageArchiveFileKey();
     await archiveFile.moveToDisk(archiveFileName, 'fs');
 
     await PackagePublishJob.dispatch({

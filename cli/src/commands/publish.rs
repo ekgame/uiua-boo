@@ -1,11 +1,24 @@
 use std::{
-    cmp, collections::HashSet, error::Error, fs, path::{self, PathBuf}, process, time::Duration, vec
+    cmp,
+    collections::HashSet,
+    error::Error,
+    fs,
+    path::{self, PathBuf},
+    process,
+    time::Duration,
+    vec,
 };
 
 use owo_colors::OwoColorize;
 
 use crate::{
-    api::{ApiRequestError, AuthRequest, AuthRequestResponse, AuthRequestStatus, BooApiClient, CreatePublishJobRequest, PackagePublishJobStatus}, common::BooPackageDefinition, print_error, print_success, print_warning, PublishArgs
+    PublishArgs,
+    api::{
+        ApiRequestError, AuthRequest, AuthRequestResponse, AuthRequestStatus, BooApiClient,
+        CreatePublishJobRequest, PackagePublishJobStatus, PublishJobResult,
+    },
+    common::BooPackageDefinition,
+    print_error, print_success, print_warning,
 };
 
 use flate2::Compression;
@@ -111,9 +124,7 @@ impl From<&ApiRequestError> for PublishingError {
                     .collect::<Vec<_>>()
                     .join(", "),
             ),
-            ApiRequestError::AuthError(message) => {
-                PublishingError::ApiError(message.clone())
-            }
+            ApiRequestError::AuthError(message) => PublishingError::ApiError(message.clone()),
         }
     }
 }
@@ -327,8 +338,7 @@ fn do_publish(package: VerifiedPackage) -> Result<(), PublishingError> {
 
         print_success("Package uploaded successfully, waiting for publishing job to complete...");
 
-        run_check_publish_job_status_loop(&client, publish_job.publishing_id)
-            .await?;
+        run_check_publish_job_status_loop(&client, publish_job.publishing_id).await?;
 
         Ok(())
     })
@@ -371,8 +381,10 @@ async fn run_auth_verification_loop(
     }
 }
 
-async fn run_check_publish_job_status_loop(client: &BooApiClient, publishing_id: i64) -> Result<(), PublishingError> {
-    
+async fn run_check_publish_job_status_loop(
+    client: &BooApiClient,
+    publishing_id: i64,
+) -> Result<(), PublishingError> {
     let start_time = std::time::Instant::now();
 
     loop {
@@ -384,7 +396,8 @@ async fn run_check_publish_job_status_loop(client: &BooApiClient, publishing_id:
 
         sleep(Duration::from_secs(POLLING_INTERVAL_SECS)).await;
 
-        let publish_job = client.get_publish_job_status(publishing_id)
+        let publish_job = client
+            .get_publish_job_status(publishing_id)
             .await
             .map_err(|e| PublishingError::from(&e))?;
 
@@ -393,9 +406,13 @@ async fn run_check_publish_job_status_loop(client: &BooApiClient, publishing_id:
                 return Ok(());
             }
             PackagePublishJobStatus::Failed => {
-                return Err(PublishingError::PublishJobErrors(vec![
-                    "TODO: get errors".to_string(),
-                ]));
+                let errors = match publish_job.result {
+                    Some(PublishJobResult::Failure(e)) => {
+                        e.errors.iter().map(|i| i.message.clone()).collect()
+                    }
+                    _ => vec!["Publishing job failed without details".into()],
+                };
+                return Err(PublishingError::PublishJobErrors(errors));
             }
             _ => continue,
         }

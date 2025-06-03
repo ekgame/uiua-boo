@@ -85,12 +85,12 @@ pub struct PublishJob {
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum PublishJobResult {
     Success,
-    Error(PublishJobResultError),
+    Failure(PublishJobResultErrors),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct PublishJobResultError {
-    pub errors: Vec<String>,
+pub struct PublishJobResultErrors {
+    pub errors: Vec<ApiError>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
