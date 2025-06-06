@@ -8,13 +8,17 @@ import { marked } from 'marked';
 import createDOMPurify, { WindowLike } from 'dompurify';
 import { JSDOM } from 'jsdom';
 import markedFootnote from 'marked-footnote';
+import { uiuaifyNameToIdentifier } from "../../utils/uiua.js";
+import Package from "./Package.js";
+import { PackageFileNode, PackageFileSystem } from "../../utils/files.js";
+import { errors } from "@adonisjs/core";
 
 export default class PackageController {
   async packages({ view }: HttpContext) {
     return view.render('pages/packages');
   }
 
-  async getVersionOverviewData(version: PackageVersion) {
+  async getVersionOverviewData(pack: Package, version: PackageVersion) {
     let readme = null;
 
     const disk = drive.use('fs')
@@ -35,8 +39,20 @@ export default class PackageController {
       }
     }
 
+    const hasLibraryFile = await version.getFile('lib.ua');
+    const hasExecutableFile = await version.getFile('main.ua');
+
+    let importStatement = null;
+    if (hasLibraryFile) {
+      const identifier = uiuaifyNameToIdentifier(pack.name);
+      importStatement = `${identifier} ~ "boo:${pack.reference}"`;
+    }
+    
     return {
       readme,
+      hasLibraryFile,
+      hasExecutableFile,
+      importStatement,
     };
   }
 
@@ -48,13 +64,53 @@ export default class PackageController {
 
     let versionData = null;
     if (version) {
-      versionData = await this.getVersionOverviewData(version);
+      versionData = await this.getVersionOverviewData(pack, version);
     }
 
     return view.render('pages/package/show', {
       pack,
       version,
       ...versionData
+    });
+  }
+
+  async files({ view, params }: HttpContext) {
+    const { pack, version } = await PackageResolver
+      .fromScopeAndName(params.scope, params.name)
+      .withVersion(params.version)
+      .expectExactVersion()
+      .expectVersion()
+      .resolveOrFail();
+
+    const packageVersion = version!;
+    await packageVersion.loadOnce('files');
+    
+    const fileSystem = new PackageFileSystem(packageVersion);
+    fileSystem.addFiles(packageVersion.files);
+    await fileSystem.finalize();
+
+    const path = (params['*'] || ['']).join('/');
+    const fileNode = fileSystem.resolveFile(path);
+
+    if (!fileNode) {
+      throw new errors.E_HTTP_EXCEPTION(
+        `File '${path}' not found`,
+        { status: 404 },
+      );
+    }
+
+    let fileContent = null;
+    if (fileNode.isFile && fileNode.file && fileNode.file.fileKey && fileNode.file.isPreviewable) {
+      const disk = drive.use('fs');
+      fileContent = await disk.get(fileNode.file.fileKey);
+    }
+
+    return view.render('pages/package/files', {
+      pack,
+      version,
+      fileNode,
+      fileContent,
+      generateFileUrl: (fileNode: PackageFileNode) => fileSystem.generateFileUrl(fileNode),
     });
   }
 

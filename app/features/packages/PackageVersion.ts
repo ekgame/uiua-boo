@@ -29,7 +29,7 @@ export default class PackageVersion extends BaseModel {
   @belongsTo(() => Package, {
     foreignKey: 'packageId',
   })
-  declare package: BelongsTo<typeof Package>
+  declare pack: BelongsTo<typeof Package>
 
   @hasMany(() => PackageVersionFile, {
     foreignKey: 'packageVersionId',

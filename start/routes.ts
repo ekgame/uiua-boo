@@ -45,6 +45,9 @@ router
     router.group(() => {
       router.get('/', [PackageController, 'show']).as('package.show');
       router.get('/init', [PackageController, 'init']).as('package.init').use(middleware.auth());
+
+      router.get('/:version', [PackageController, 'files']).as('package.files.root');
+      router.get('/:version/*', [PackageController, 'files']).as('package.files');
     }).prefix('/:name');
   })
   .prefix('/:scope')

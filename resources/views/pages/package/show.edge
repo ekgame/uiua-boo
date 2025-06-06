@@ -4,14 +4,32 @@
     @include('pages/package/_header')
 
     @if(version)
-      <div class="markdown mt-4">
-        @if(readme)
-          {{{ readme }}}
-        @else
-          <p class="text-gray-500 italic">
-            No README file found for this package.
-          </p>
-        @end
+      <div class="flex mt-4 gap-6">
+        <div class="markdown">
+          @if(readme)
+            {{{ readme }}}
+          @else
+            <p class="text-gray-500 italic">
+              No README file found for this package.
+            </p>
+          @end
+        </div>
+      
+        <div class="w-[400px]">
+          @if(hasLibraryFile && importStatement)
+            <p class="mb-2">Use in Uiua:</p>
+            <pre class="bg-gray-900 p-2 rounded"><code>{{ importStatement }}</code></pre>
+            <hr class="my-4 border-t border-gray-500"/>
+          @end
+
+          @if(hasExecutableFile)
+            <p class="mb-2">Run the app:</p>
+            <pre class="bg-gray-900 p-2 rounded"><code>boo run {{ pack.reference }}</code></pre>
+            <hr class="my-4 border-t border-gray-500"/>
+          @end
+
+          <a href="#" class="link">Download package</a>
+        </div>
       </div>
     @end
   @endslot

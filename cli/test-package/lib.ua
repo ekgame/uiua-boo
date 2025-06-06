@@ -1,1 +1,1 @@
-Greet ← &p $"Hello, _!"
+~ "src/greet.ua" ~ Greet

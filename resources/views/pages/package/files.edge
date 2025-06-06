@@ -1,0 +1,49 @@
+@layout.base()
+  @slot('main')
+    @let(activeTab = 'files')
+    @include('pages/package/_header')
+
+    <div class="text-lg my-4">
+      <ul class="flex gap-2">
+        @each(ancestorFile in fileNode.ancestors)
+          <li>
+            <a href="{{ generateFileUrl(ancestorFile) }}" class="link">{{ ancestorFile.displayName }}</a>
+          </li>
+          <li class="text-gray-500">/</li>
+        @endeach
+        <li>
+          {{ fileNode.displayName }}
+        </li>
+      </ul>
+    </div>
+
+    @if(fileNode.isDirectory)
+      <ul>
+        @each(file in fileNode.children)
+          <li class="not-last:border-b border-gray-800">
+            <a
+              href="{{ generateFileUrl(file) }}"
+              class="flex gap-1 items-center text-purple-400 font-bold hover:bg-purple-400/20 p-2"
+            >
+              <span class="text-gray-200">
+                @if(file.isDirectory)
+                  @svg('tabler:folder')
+                @else
+                  @svg('tabler:file')
+                @end
+              </span>
+
+              {{ file.name }}
+            </a>
+          </li>
+        @endeach
+      </ul>
+    @elseif(fileNode.isFile)
+      @if(fileContent)
+        <pre class="bg-gray-900 p-4 rounded"><code>{{ fileContent }}</code></pre>
+      @else
+        <p class="text-gray-400 italic">File preview is not available.</p> 
+      @endif
+    @end
+  @endslot
+@end

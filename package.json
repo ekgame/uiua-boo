@@ -66,6 +66,7 @@
     "adonisjs-jobs": "^0.0.26",
     "adonisjs-scheduler": "^2.4.0",
     "better-sqlite3": "^11.9.1",
+    "case": "^1.6.3",
     "dompurify": "^3.2.6",
     "edge-iconify": "^2.0.1",
     "edge.js": "^6.2.1",

@@ -2,12 +2,13 @@
   @slot('main')
     @let(activeTab = 'packages')
     @include('pages/scope/_header')
+    
     <ul>
       @each(package in scope.packages)
         <li class="not-last:border-b border-gray-800">
           <a
             href="{{ route('package.show', { scope: scope.reference, name: package.name }) }}"
-            class="block text-purple-400 font-bold hover:bg-purple-400/20 p-4 "
+            class="block text-purple-400 font-bold hover:bg-purple-400/20 p-4"
           >
             {{ package.reference }}
             @if(package.latestStableVersion)
