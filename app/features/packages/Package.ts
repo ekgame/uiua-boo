@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
-import { afterCreate, BaseModel, beforeFetch, beforeFind, belongsTo, column, computed, hasMany } from '@adonisjs/lucid/orm'
+import { afterCreate, BaseModel, beforeFetch, beforeFind, belongsTo, column, computed, hasMany, hasOne } from '@adonisjs/lucid/orm'
 import Scope from '../scopes/Scope.js'
-import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import type { BelongsTo, HasMany, HasOne } from '@adonisjs/lucid/types/relations'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import PackageVersion from './PackageVersion.js'
 import { SemVer } from 'semver'
@@ -14,6 +14,9 @@ export default class Package extends BaseModel {
 
   @column()
   declare scopeId: number
+
+  @column()
+  declare latestStableVersionId: number
 
   @column()
   declare name: string
@@ -39,6 +42,9 @@ export default class Package extends BaseModel {
     foreignKey: 'packageId',
   })
   declare versions: HasMany<typeof PackageVersion>
+
+  @hasOne(() => PackageVersion)
+  declare latestStableVersion: HasOne<typeof PackageVersion>
 
   @computed()
   get reference() {

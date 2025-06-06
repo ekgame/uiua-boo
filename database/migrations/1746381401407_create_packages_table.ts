@@ -9,6 +9,7 @@ export default class extends BaseSchema {
       table.string('name').notNullable()
       table.string('description', 255).notNullable().defaultTo('')
       table.boolean('is_archived').notNullable().defaultTo(false)
+      table.integer('latest_stable_version_id').nullable()
 
       table.timestamp('created_at')
       table.timestamp('updated_at')

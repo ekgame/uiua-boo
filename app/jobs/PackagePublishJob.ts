@@ -176,6 +176,7 @@ export default class PackagePublishJob extends Job {
         await PackageVersionFile.create({
           packageVersionId: packageVersion.id,
           path: entry.path,
+          sizeBytes: entry.content.length,
           fileKey,
           mimeType,
           isPreviewable,
@@ -183,6 +184,12 @@ export default class PackagePublishJob extends Job {
       }
 
       await trx.commit();
+
+      if (packageVersion.semver.prerelease.length === 0) {
+        this.logger.info(`Setting latest stable version for package ${job.relatedPackage.reference}`);
+        job.relatedPackage.latestStableVersionId = packageVersion.id;
+        await job.relatedPackage.save();
+      }
     } catch (error) {
       this.logger.error(`Error during doJob: ${normalizeException(error).message}. Initiating cleanup.`);
       await Promise.allSettled(cleanupFunctions.map(fn => fn().catch((e: Error) => this.logger.error(`Cleanup function failed: ${normalizeException(e).message}`))));

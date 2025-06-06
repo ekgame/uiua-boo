@@ -9,6 +9,7 @@ export default class extends BaseSchema {
 
       table.integer('package_version_id').notNullable()
       table.string('path').notNullable()
+      table.bigint('size_bytes').notNullable()
       table.string('file_key').nullable()
       table.string('mime_type').nullable()
       table.boolean('is_previewable').notNullable()

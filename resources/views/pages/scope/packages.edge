@@ -10,6 +10,9 @@
             class="block text-purple-400 font-bold hover:bg-purple-400/20 p-4 "
           >
             {{ package.reference }}
+            @if(package.latestStableVersion)
+              <span class="text-gray-300 text-sm">{{ package.latestStableVersion?.version }}</span>
+            @end
           </a>
         </li>
       @end

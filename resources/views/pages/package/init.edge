@@ -9,7 +9,7 @@
         <li>
           <div class="flex flex-col gap-2">
             <p>Run this command in the root of your project:</p>
-            <code class="bg-gray-800 px-4 py-2 rounded-md font-bold self-start text-gray-200">boo init {{ pack.identifier }}</code>
+            <code class="bg-gray-800 px-4 py-2 rounded-md font-bold self-start text-gray-200">boo init {{ pack.reference }}</code>
             <p>A default package configuration file <code class="bg-gray-700 p-1 rounded-md">boo.json</code> will be created:</p>
             <div class="bg-gray-800 rounded-md self-start">
               <code class="px-4 py-2 flex text-gray-400">boo.json</code>
@@ -18,7 +18,7 @@
                 {{-- TODO: color coded with line numbers --}}
               <pre class="px-4 py-2 flex text-gray-200">
 {
-  "name": "{{ pack.identifier }}",
+  "name": "{{ pack.reference }}",
   "version": "0.1.0",
   "include": [
     "/**/*.ua",

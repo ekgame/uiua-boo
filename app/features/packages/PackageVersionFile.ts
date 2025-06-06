@@ -16,6 +16,9 @@ export default class PackageVersionFile extends BaseModel {
   declare path: string
 
   @column()
+  declare sizeBytes: number
+
+  @column()
   declare fileKey: string|null
 
   @column()

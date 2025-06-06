@@ -4,7 +4,9 @@ import Scope from "./Scope.js";
 export default class ScopeController {
   async packages({ params, view }: HttpContext) {
     const scope = await Scope.findByOrFail('name', params.scope);
-    await scope.loadOnce('packages');
+    await scope.load('packages', (query) => {
+      query.preload('latestStableVersion');
+    });
 
     return view.render('pages/scope/packages', {
       scope: scope,
