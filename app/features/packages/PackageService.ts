@@ -3,7 +3,7 @@ import Scope from "../scopes/Scope.js";
 import { createPackageValidator } from "./validators.js";
 import logger from "@adonisjs/core/services/logger";
 import PackageVersion from "./PackageVersion.js";
-import semver, { SemVer } from "semver";
+import semver from "semver";
 
 class PackageService {
   async createPackage(scope: Scope, packageName: string): Promise<Package> {
