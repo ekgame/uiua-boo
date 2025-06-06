@@ -12,7 +12,10 @@ export default class PackagePolicy extends BasePolicy {
       return AuthorizationResponse.deny("You are not a member of this scope.");
     }
 
-    // TODO: deny if the pack has versions
+    await pack.loadOnce('versions');
+    if (pack.versions.length > 0) {
+      return AuthorizationResponse.deny("This package already has versions published, you cannot initialize it again.");
+    }
 
     return AuthorizationResponse.allow();
   }

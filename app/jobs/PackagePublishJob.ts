@@ -70,22 +70,22 @@ export default class PackagePublishJob extends Job {
       throw new Error('Related package not found for the publishing job.');
     }
 
-    this.logger.info(`Validating package archive for ${job.relatedPackage.fullName} v${job.version}`);
+    this.logger.info(`Validating package archive for ${job.relatedPackage.reference} v${job.version}`);
     const physicalArchivePath = app.makePath('storage', 'files', pendingArchiveFile);
     const cli = CliRunner.getInstance();
 
     const validationResults = await cli.validatePackageArchive(physicalArchivePath, {
-      expectedName: job.relatedPackage.fullName,
+      expectedName: job.relatedPackage.reference,
       expectedVersion: job.version,
     });
 
     if (validationResults.length > 0) {
-      this.logger.warn(`Package validation failed for ${job.relatedPackage.fullName} v${job.version}:`, validationResults);
+      this.logger.warn(`Package validation failed for ${job.relatedPackage.reference} v${job.version}:`, validationResults);
       await job.updateFailed(validationResults);
       return false;
     }
 
-    this.logger.info(`Package validation successful for ${job.relatedPackage.fullName} v${job.version}`);
+    this.logger.info(`Package validation successful for ${job.relatedPackage.reference} v${job.version}`);
 
     // The functions to execute to clean up any loose ends
     // in case of an error while setting everything up.
@@ -117,9 +117,9 @@ export default class PackagePublishJob extends Job {
         version: job.version,
         artifactFileKey: artifactKey,
       }, { client: trx });
-      this.logger.info(`Created package version entry ${job.relatedPackage.fullName} v${job.version} with ID ${packageVersion.id}`);
 
-      this.logger.info(`Extracting archive entries`);
+      this.logger.info(`Created package version entry ${job.relatedPackage.reference} v${job.version} with ID ${packageVersion.id}`);
+
       const entries: { path: string, content: Buffer }[] = [];
       await new Promise<void>((resolve, reject) => {
         archiveStream

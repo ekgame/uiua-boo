@@ -22,6 +22,18 @@ class PackageService {
     return newPackage;
   }
 
+  async getPackageByReference(reference: string): Promise<Package|null> {
+    const parts = reference.split('/');
+    if (parts.length !== 2 || !parts[0].startsWith('@')) {
+      return null;
+    }
+
+    const scope = parts[0].slice(1);
+    const name = parts[1];
+
+    return await this.getPackage(scope, name);
+  }
+
   async getPackage(scope: string|null, name: string|null): Promise<Package|null> {
     if (!scope || !name) {
       return null;

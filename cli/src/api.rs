@@ -66,7 +66,6 @@ pub struct AuthRequestDeleteResponse {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreatePublishJobRequest {
-    pub scope: String,
     pub name: String,
     pub version: String,
 }
@@ -74,7 +73,6 @@ pub struct CreatePublishJobRequest {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PublishJob {
     pub publishing_id: i64,
-    pub package_scope: String,
     pub package_name: String,
     pub publishing_version: String,
     pub status: PackagePublishJobStatus,

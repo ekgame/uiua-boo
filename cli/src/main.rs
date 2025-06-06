@@ -29,7 +29,7 @@ enum Commands {
 
 #[derive(Args, Debug)]
 struct InitArgs {
-    #[clap(default_value = "foo/bar")]
+    #[clap(default_value = "@foo/bar")]
     package_name: String,
 }
 

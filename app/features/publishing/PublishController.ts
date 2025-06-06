@@ -62,7 +62,7 @@ export default class PublishController {
     const user = auth.getUserOrFail();
     const data = await PublishService.validatePublishRequest(
       user,
-      request.only(['scope', 'name', 'version']),
+      request.only(['name', 'version']),
     );
 
     const job = await PackagePublishJobModel.create({
@@ -129,8 +129,7 @@ export default class PublishController {
 
     return {
       publishing_id: job.id,
-      package_scope: job.relatedPackage.scope.name,
-      package_name: job.relatedPackage.name,
+      package_name: job.relatedPackage.reference,
       publishing_version: job.version,
       status: job.status,
       result: job.result ? JSON.parse(job.result) : null,

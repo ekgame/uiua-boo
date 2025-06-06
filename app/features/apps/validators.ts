@@ -2,7 +2,7 @@ import vine from '@vinejs/vine'
 import { concatRegex } from '../../utils/validation.js';
 import { Infer } from '@vinejs/vine/types';
 
-export const scopeWithOptionalPackageAndVersion = /(?<scope>[a-z0-9]+(-[a-z0-9]+)*)(\/(?<name>[a-z0-9]+(-[a-z0-9]+)*)(@(?<version>[a-z0-9\.\-\+]+))?)?/;
+export const scopeWithOptionalPackageAndVersion = /(?<scope>\@[a-z0-9]+(-[a-z0-9]+)*)(\/(?<name>[a-z0-9]+(-[a-z0-9]+)*)(@(?<version>[a-z0-9\.\-\+]+))?)?/;
 
 const appPermission = vine.union([
   vine.union.if(
@@ -45,7 +45,7 @@ export function parsePermissionString(string: Infer<typeof appPermission>): Acce
     
     return {
       type: 'package.upload-new-version',
-      scope: match.groups.scope,
+      scope: match.groups.scope.slice(1),
       name: match.groups.name,
       version: match.groups.version,
     };

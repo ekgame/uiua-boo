@@ -17,9 +17,9 @@ class PublishService {
   ): Promise<{ version: SemVer, package: Package }> {
     const data = await publishPackageValidator.validate(input);
 
-    const targetPackage = await PackageService.getPackage(data.scope, data.name);
+    const targetPackage = await PackageService.getPackageByReference(data.name);
     if (!targetPackage) {
-      throw new ValidationError(`Package "${data.scope}/${data.name}" does not exist, did you create the package?`);
+      throw new ValidationError(`Package "${data.name}" does not exist, did you create the package?`);
     }
 
     await new Bouncer(user)
@@ -28,15 +28,15 @@ class PublishService {
 
     const latestVersion = await PackageService.getLatestVersion(targetPackage);
     if (latestVersion && semver.eq(latestVersion.semver, data.version)) {
-      throw new ValidationError(`Package "${data.scope}/${data.name}" already has published version '${data.version}'.`);
+      throw new ValidationError(`Package "${targetPackage.reference}" already has published version '${data.version}'.`);
     } else if (latestVersion && semver.gt(latestVersion.semver, data.version)) {
-      throw new ValidationError(`Package "${data.scope}/${data.name}" already has version '${latestVersion.semver}', which is newer than '${data.version}'.`);
+      throw new ValidationError(`Package "${targetPackage.reference}" already has version '${latestVersion.semver}', which is newer than '${data.version}'.`);
     }
 
     if (await this.packageHasPublishJob(targetPackage)) {
-      throw new ValidationError(`Package "${data.scope}/${data.name}" already has a pending publish job, please wait for it to complete.`);
+      throw new ValidationError(`Package "${targetPackage.reference}" already has a pending publish job, please wait for it to complete.`);
     }
-    
+
     return {
       version: data.version,
       package: targetPackage,

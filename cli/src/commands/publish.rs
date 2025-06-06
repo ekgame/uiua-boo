@@ -130,7 +130,7 @@ impl From<&ApiRequestError> for PublishingError {
 }
 
 pub(crate) fn run_publish(args: PublishArgs) {
-    let package_data = validate_package().unwrap_or_else(|e| {
+    let package_data = get_current_package().unwrap_or_else(|e| {
         print_error(&e);
         process::exit(1);
     });
@@ -210,7 +210,7 @@ pub(crate) fn run_publish(args: PublishArgs) {
     }
 }
 
-fn validate_package() -> Result<PublishingData, String> {
+fn get_current_package() -> Result<PublishingData, String> {
     let file_path = path::Path::new("boo.json");
     if !file_path.exists() {
         return Err("'boo.json' file not found. Please run `boo init` first.".to_string());
@@ -223,10 +223,6 @@ fn validate_package() -> Result<PublishingData, String> {
         .map_err(|e| format!("Failed to parse boo.json: {}", e.to_string()))?;
 
     let mut issues = PublishingIssues::new();
-
-    for error in validate::validate_package_definition(&package_definition) {
-        issues.add_error(error.message);
-    }
 
     let mut files: HashSet<PathBuf> = HashSet::new();
     for pattern in &package_definition.include {
@@ -323,8 +319,7 @@ fn do_publish(package: VerifiedPackage) -> Result<(), PublishingError> {
         print_success("Creating publishing job...");
         let publish_job = client
             .create_publishing_job(CreatePublishJobRequest {
-                scope: package.package.scope(),
-                name: package.package.package_name(),
+                name: package.package.name,
                 version: package.package.version.clone(),
             })
             .await

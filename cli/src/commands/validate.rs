@@ -253,7 +253,13 @@ pub fn validate_package_name(name: &String) -> Result<String, ValidationError> {
         ));
     }
 
-    let parts: Vec<&str> = name.split('/').collect();
+    let stripped_name = name
+        .strip_prefix("@")
+        .ok_or_else(|| {
+            ValidationError::new(format!("package name '{}' must start with '@'", name))
+        })?;
+    
+    let parts: Vec<&str> = stripped_name.split('/').collect();
     if parts.len() != 2 {
         return Err(ValidationError::new(
             "package name must contain exactly one '/'".to_string(),
