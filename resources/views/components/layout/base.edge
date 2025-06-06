@@ -16,15 +16,15 @@
     <nav class="flex flex-col px-4 py-2 gap-2">
       <div class="flex items-center justify-between gap-4 whitespace-nowrap">
         @if(simplifiedNavigation === undefined || !simplifiedNavigation)
-        <a href="{{ route('home') }}" class="flex items-center gap-1 hover:text-gray-400">
-          @svg('tabler:ghost-3-filled', { class: 'size-6' })
-          <span class="font-bold text-xl">Boo!</span>
-        </a>
-        <div class="w-full max-sm:hidden">
-          @!ui.packageSearch()
-        </div>
+          <a href="{{ route('home') }}" class="flex items-center gap-1 hover:text-gray-400">
+            @svg('tabler:ghost-3-filled', { class: 'size-6' })
+            <span class="font-bold text-xl">Boo!</span>
+          </a>
+          <div class="w-full max-sm:hidden">
+            @!ui.packageSearch()
+          </div>
         @else
-        <div></div>
+          <div></div>
         @end
 
         <div class="flex gap-2">
@@ -43,26 +43,26 @@
           <span class="text-gray-400">&middot;</span>
 
           @if(auth.user)
-          <a href="#" class="text-gray-200 hover:text-gray-400">
-            {{ auth.user?.githubName || 'Guest' }}
-          </a>
+            <a href="#" class="text-gray-200 hover:text-gray-400">
+              {{ auth.user?.githubName || 'Guest' }}
+            </a>
           @else
-          <a href="{{ route('auth.login') }}" class="text-gray-200 hover:text-gray-400 flex gap-1 items-center">
-            @svg('tabler:brand-github', { class: 'size-5' })
-            Login
-          </a>
+            <a href="{{ route('auth.login') }}" class="text-gray-200 hover:text-gray-400 flex gap-1 items-center">
+              @svg('tabler:brand-github', { class: 'size-5' })
+              Login
+            </a>
           @end
         </div>
       </div>
 
       @if(simplifiedNavigation === undefined || !simplifiedNavigation)
-      <div class="w-full sm:hidden">
-        @!ui.packageSearch()
-      </div>
+        <div class="w-full sm:hidden">
+          @!ui.packageSearch()
+        </div>
       @end
     </nav>
 
-    <main class="flex-1 px-4">
+    <main class="flex-1 px-4 mt-6">
       {{{ await $slots.main() }}}
     </main>
 

@@ -11,7 +11,8 @@
     "test": "node ace test",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "reset": "rm -rf storage && mkdir storage && touch storage/.gitkeep && node ace migration:fresh"
   },
   "imports": {
     "#exceptions/*": "./app/exceptions/*.js",

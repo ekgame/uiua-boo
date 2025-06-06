@@ -1,0 +1,10 @@
+@if(!$context.tabs)
+  @newError(
+    'The ui.tab component should be nested within the ui.tabs component',
+    $caller.filename,
+    $caller.line,
+    $caller.col
+  )
+@end
+
+@eval($context.tabs.push({ id, label, href }))

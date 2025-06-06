@@ -1,0 +1,23 @@
+@let(tabs = [])
+
+{{-- Share tabs array with children --}}
+@inject({ tabs })
+
+{{-- Execute children, but do not render them --}}
+@eval(await $slots.main())
+
+<div class="flex justify-start w-full border-b-4 border-gray-800">
+  @each(tab in tabs)
+    <a
+      href="{{ tab.href }}"
+      class="{{ html.classNames([
+        'px-4 py-2 bg-gray-600 text-gray-200 hover:bg-purple-600',
+        {
+          'bg-purple-600 border-b-4 border-purple-800 -mb-1': tab.id == active,
+        }
+      ]) }}"
+    >
+      {{ tab.label }}
+    </a>
+  @end
+</div>

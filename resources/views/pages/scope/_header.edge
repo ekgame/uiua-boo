@@ -1,0 +1,6 @@
+<h1 class="text-2xl mb-2">{{ scope.reference }}</h1>
+@ui.tabs({active: activeTab})
+  @!ui.tab({id: 'packages', label: 'Packages', href: route('scope.packages', { scope: scope.reference })})
+  @!ui.tab({id: 'members', label: 'Members', href: route('scope.members', { scope: scope.reference })})
+  @!ui.tab({id: 'settings', label: 'Settings', href: route('scope.settings', { scope: scope.reference })})
+@end

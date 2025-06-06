@@ -39,16 +39,16 @@ export default class HttpExceptionHandler extends ExceptionHandler {
       error.message = `${error.model.name} not found.`;
     }
 
-    if (ctx.request.accepts(['json'])) {
-      return this.renderErrorAsJSON(error, ctx);
+    switch (ctx.request.accepts(['html', 'json'])) {
+      case 'json':
+        return this.renderErrorAsJSON(error, ctx);
+      case 'html':
+      default:
+        if (this.debug && error.status >= 500 && error.status <= 599) {
+          return this.renderErrorAsHTML(error, ctx);
+        }
+        return htmlRenderer();
     }
-
-    return htmlRenderer();
-  }
-
-  protected isDebuggingEnabled(ctx: HttpContext): boolean {
-    const isServerError = ctx.response.getStatus() >= 500 && ctx.response.getStatus() <= 599;
-    return this.debug && isServerError;
   }
 
   /**

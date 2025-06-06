@@ -1,5 +1,11 @@
 @layout.base()
   @slot('main')
-    <h1 class="text-2xl">{{ pack.identifier }}</h1>
+    <h1 class="text-3xl">
+      <a href="{{ route('scope.packages', { scope: pack.scope.reference }) }}" class="text-purple-400 font-bold">{{ pack.scope.reference }}</a>
+      /
+      <a href="{{ route('package.show', { scope: pack.scope.reference, name: pack.name }) }}" class="text-purple-400 font-bold">
+        {{ pack.name }}
+      </a>
+    </h1>
   @endslot
 @end

@@ -15,6 +15,7 @@ import PackageController from '../app/features/packages/PackageController.js';
 import AuthController from '../app/features/users/AuthController.js';
 import PublishController from '../app/features/publishing/PublishController.js';
 import AppController from '../app/features/apps/AppController.js';
+import ScopeController from '#features/scopes/ScopeController';
 
 // TODO: add admin requirement for the dashboard
 router.jobs()
@@ -37,10 +38,16 @@ router
 
 router
   .group(() => {
-    router.get('/', [PackageController, 'show']).as('package.show');
-    router.get('/init', [PackageController, 'init']).as('package.init').use(middleware.auth());
+    router.get('/', [ScopeController, 'packages']).as('scope.packages');
+    router.get('/~/members', [ScopeController, 'members']).as('scope.members');
+    router.get('/~/settings', [ScopeController, 'settings']).as('scope.settings');
+
+    router.group(() => {
+      router.get('/', [PackageController, 'show']).as('package.show');
+      router.get('/init', [PackageController, 'init']).as('package.init').use(middleware.auth());
+    }).prefix('/:name');
   })
-  .prefix('/:scope/:name')
+  .prefix('/:scope')
   .where('scope', {
     match: /^@/,
     cast: (scope) => scope.replace(/^@/, ''),

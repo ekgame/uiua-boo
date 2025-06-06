@@ -1,0 +1,18 @@
+@layout.base()
+  @slot('main')
+    @let(activeTab = 'members')
+    @include('pages/scope/_header')
+    <ul>
+      @each(member in scope.members)
+        <li class="not-last:border-b border-gray-800">
+          <a
+            href="#"
+            class="block text-purple-400 font-bold hover:bg-purple-400/20 p-4 "
+          >
+            {{ member.githubName }}
+          </a>
+        </li>
+      @end
+    </ul>
+  @endslot
+@end
