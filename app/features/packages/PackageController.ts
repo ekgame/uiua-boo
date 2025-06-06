@@ -2,10 +2,42 @@ import PackagePolicy from "./PackagePolicy.js";
 import { HttpContext } from "@adonisjs/core/http";
 import { PackageResolver } from "./PackageResolver.js";
 import { makeAbsoluteUrl } from "../../utils/url.js";
+import PackageVersion from "./PackageVersion.js";
+import drive from "@adonisjs/drive/services/main";
+import { marked } from 'marked';
+import createDOMPurify, { WindowLike } from 'dompurify';
+import { JSDOM } from 'jsdom';
+import markedFootnote from 'marked-footnote';
 
 export default class PackageController {
   async packages({ view }: HttpContext) {
     return view.render('pages/packages');
+  }
+
+  async getVersionOverviewData(version: PackageVersion) {
+    let readme = null;
+
+    const disk = drive.use('fs')
+    const readmeFile = await version.getFile('README.md');
+    if (readmeFile && readmeFile.fileKey) {
+      const content = await disk.get(readmeFile.fileKey);
+      if (content) {
+        const md = marked
+          .use(markedFootnote())
+          .use({
+            pedantic: false,
+            gfm: true,
+          });
+
+        const window = new JSDOM('').window as unknown as WindowLike;
+        const purify = createDOMPurify(window);
+        readme = purify.sanitize(await md.parse(content));
+      }
+    }
+
+    return {
+      readme,
+    };
   }
 
   async show({ view, params }: HttpContext) {
@@ -14,9 +46,15 @@ export default class PackageController {
       .expectExactVersion()
       .resolveOrFail();
 
+    let versionData = null;
+    if (version) {
+      versionData = await this.getVersionOverviewData(version);
+    }
+
     return view.render('pages/package/show', {
       pack,
       version,
+      ...versionData
     });
   }
 

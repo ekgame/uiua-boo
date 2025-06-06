@@ -2,5 +2,17 @@
   @slot('main')
     @let(activeTab = 'overview')
     @include('pages/package/_header')
+
+    @if(version)
+      <div class="markdown mt-4">
+        @if(readme)
+          {{{ readme }}}
+        @else
+          <p class="text-gray-500 italic">
+            No README file found for this package.
+          </p>
+        @end
+      </div>
+    @end
   @endslot
 @end

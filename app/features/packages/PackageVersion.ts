@@ -40,4 +40,9 @@ export default class PackageVersion extends BaseModel {
   get semver() {
     return semver.parse(this.version)!;
   }
+
+  async getFile(filePath: string) {
+    await (this as PackageVersion).loadOnce('files');
+    return this.files.find(file => file.path === filePath);
+  }
 }

@@ -37,3 +37,282 @@ pre {
     color: color-mix(in srgb, currentColor, black 20%);
   }
 }
+
+.markdown {
+  @apply text-gray-200 leading-relaxed;
+
+  /* Headers */
+  h1 {
+    @apply text-4xl font-bold mt-8 mb-4 text-gray-200 border-b border-gray-500 pb-2;
+  }
+
+  h2 {
+    @apply text-3xl font-semibold mt-8 mb-4 text-gray-200 border-b border-gray-500 pb-2;
+  }
+
+  h3 {
+    @apply text-2xl font-semibold mt-6 mb-3 text-gray-200;
+  }
+
+  h4 {
+    @apply text-xl font-medium mt-6 mb-3 text-gray-200;
+  }
+
+  h5 {
+    @apply text-lg font-medium mt-4 mb-2 text-gray-200;
+  }
+
+  h6 {
+    @apply text-base font-medium mt-4 mb-2 text-gray-200;
+  }
+
+  /* Paragraphs */
+  p {
+    @apply mb-4 leading-6;
+  }
+
+  /* Text formatting */
+  strong {
+    @apply font-semibold;
+  }
+
+  em {
+    @apply italic;
+  }
+
+  del {
+    @apply line-through text-gray-500;
+  }
+
+  /* Links */
+  a {
+    @apply text-purple-400 hover:text-purple-200 underline transition-colors duration-200;
+  }
+
+  /* Lists */
+  ul {
+    @apply mb-4 pl-6 space-y-2;
+  }
+
+  ol {
+    @apply mb-4 pl-6 space-y-2;
+  }
+
+  li {
+    @apply leading-6;
+  }
+
+  li > p {
+    @apply mb-2;
+  }
+
+  ul > li {
+    @apply list-disc;
+  }
+
+  ol > li {
+    @apply list-decimal;
+  }
+
+  /* Nested lists */
+  li ul, li ol {
+    @apply mt-2 mb-0;
+  }
+
+  /* Task lists */
+  li input[type="checkbox"] {
+    @apply mr-2;
+  }
+
+  /* Blockquotes */
+  blockquote {
+    @apply border-l-4 border-gray-500 pl-4 py-2 mb-4 italic bg-gray-600;
+  }
+
+  blockquote p {
+    @apply mb-2 last:mb-0;
+  }
+
+  /* Code */
+  code {
+    @apply bg-gray-900 px-1 py-0.5 rounded text-sm font-mono;
+  }
+
+  /* Code blocks */
+  pre {
+    @apply bg-gray-900 p-4 rounded-lg overflow-x-auto mb-4 text-sm;
+  }
+
+  pre code {
+    @apply bg-transparent p-0 text-sm;
+  }
+
+  /* Tables */
+  table {
+    @apply w-full border-collapse mb-4 overflow-hidden;
+  }
+
+  th {
+    @apply px-4 py-3 text-xs font-bold text-gray-200 bg-gray-800 tracking-wider border border-gray-600;
+  }
+
+  td {
+    @apply px-4 py-3 text-sm text-gray-200 border border-gray-600;
+  }
+
+  /* Horizontal rules */
+  hr {
+    @apply border-0 border-t border-gray-500 my-8;
+  }
+
+  /* Images */
+  img {
+    @apply max-w-full h-auto rounded-lg shadow-sm mb-4;
+  }
+
+  /* Definition lists */
+  dl {
+    @apply mb-4;
+  }
+
+  dt {
+    @apply font-semibold text-gray-900 mt-4;
+  }
+
+  dd {
+    @apply ml-4 mb-2 text-gray-700;
+  }
+
+  /* Footnotes */
+  .footnotes {
+    @apply mt-8 pt-4 border-t border-gray-500 text-sm;
+  }
+
+  .footnotes ol {
+    @apply pl-4;
+  }
+
+  .footnotes li {
+    @apply mb-2;
+  }
+
+  .sr-only {
+    @apply sr-only;
+  }
+
+  /* Syntax highlighting adjustments */
+  .hljs {
+    @apply bg-gray-900 text-gray-100;
+  }
+
+  .hljs-comment,
+  .hljs-quote {
+    @apply text-gray-400;
+  }
+
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-addition {
+    @apply text-green-400;
+  }
+
+  .hljs-number,
+  .hljs-string,
+  .hljs-meta .hljs-meta-string,
+  .hljs-literal,
+  .hljs-doctag,
+  .hljs-regexp {
+    @apply text-red-400;
+  }
+
+  .hljs-title,
+  .hljs-section,
+  .hljs-name,
+  .hljs-selector-id,
+  .hljs-selector-class {
+    @apply text-blue-400;
+  }
+
+  .hljs-attribute,
+  .hljs-attr,
+  .hljs-variable,
+  .hljs-template-variable,
+  .hljs-class .hljs-title,
+  .hljs-type {
+    @apply text-yellow-400;
+  }
+
+  .hljs-symbol,
+  .hljs-bullet,
+  .hljs-subst,
+  .hljs-meta,
+  .hljs-meta .hljs-keyword,
+  .hljs-selector-attr,
+  .hljs-selector-pseudo,
+  .hljs-built_in {
+    @apply text-cyan-400;
+  }
+
+  .hljs-deletion {
+    @apply text-red-600;
+  }
+
+  /* First paragraph after headers */
+  h1 + p,
+  h2 + p,
+  h3 + p,
+  h4 + p,
+  h5 + p,
+  h6 + p {
+    @apply mt-0;
+  }
+
+  /* Last child margin removal */
+  > *:last-child {
+    @apply mb-0;
+  }
+
+  /* First child margin removal */
+  > *:first-child {
+    @apply mt-0;
+  }
+
+  /* Inline code inside other elements */
+  h1 code, h2 code, h3 code, h4 code, h5 code, h6 code {
+    @apply text-base bg-gray-200;
+  }
+
+  /* Table alignment classes */
+  .text-left {
+    @apply text-left;
+  }
+
+  .text-center {
+    @apply text-center;
+  }
+
+  .text-right {
+    @apply text-right;
+  }
+
+  /* Print styles */
+  @media print {
+    @apply text-black;
+    
+    a {
+      @apply text-black no-underline;
+    }
+    
+    pre {
+      @apply bg-gray-100 text-black border border-gray-300;
+    }
+    
+    pre code {
+      @apply text-black;
+    }
+    
+    blockquote {
+      @apply bg-transparent border-l-2 border-black;
+    }
+  }
+}
