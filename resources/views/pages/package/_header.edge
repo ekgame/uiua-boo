@@ -1,0 +1,30 @@
+<h1 class="text-3xl flex gap-2 items-center">
+  <a href="{{ route('scope.packages', { scope: pack.scope.reference }) }}" class="text-purple-400 font-bold">{{ pack.scope.reference }}</a>
+  /
+  <a href="{{ route('package.show', { scope: pack.scope.reference, name: pack.name }) }}" class="text-purple-400 font-bold">
+    {{ pack.name }}
+  </a>
+
+  @if(version)
+    <span class="text-gray-200 text-lg px-2 py-0 bg-cyan-700 rounded-3xl">{{ version.version }}</span>
+  @end
+</h1>
+
+@if(pack.description)
+  <p class="text-gray-200 text-md mt-2">
+    {{ pack.description }}
+  </p>
+@end
+
+@if(!version)
+  <hr class="my-4 border-gray-900 border-b-4">
+  <p class="text-gray-200 text-md mt-2 italic">
+    This package has no published versions yet.
+  </p>
+@else
+  @ui.tabs({ active: activeTab, class: 'mt-4' })
+    @!ui.tab({id: 'overview', label: 'Overview', href: '#'})
+    @!ui.tab({id: 'docs', label: 'Documentation', href: '#'})
+    @!ui.tab({id: 'files', label: 'Files', href: '#'})
+  @end
+@end

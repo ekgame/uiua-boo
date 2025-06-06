@@ -43,7 +43,10 @@ export default class Package extends BaseModel {
   })
   declare versions: HasMany<typeof PackageVersion>
 
-  @hasOne(() => PackageVersion)
+  @hasOne(() => PackageVersion, {
+    localKey: 'latestStableVersionId',
+    foreignKey: 'id',
+  })
   declare latestStableVersion: HasOne<typeof PackageVersion>
 
   @computed()
@@ -63,6 +66,13 @@ export default class Package extends BaseModel {
       versionMap.set(version.semver, version);
     }
     return versionMap;
+  }
+
+  async getVersionOrFail(version: string): Promise<PackageVersion> {
+    return PackageVersion.query()
+      .where('packageId', this.id)
+      .where('version', version)
+      .firstOrFail();
   }
 
   @afterCreate()

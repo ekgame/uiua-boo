@@ -6,7 +6,15 @@
 {{-- Execute children, but do not render them --}}
 @eval(await $slots.main())
 
-<div class="flex justify-start w-full border-b-4 border-gray-800">
+<div {{
+  $props.merge({
+    class: [
+      'flex justify-start w-full border-b-4 border-gray-800',
+    ],
+  })
+  .only(['class'])
+  .toAttrs() 
+}}>
   @each(tab in tabs)
     <a
       href="{{ tab.href }}"

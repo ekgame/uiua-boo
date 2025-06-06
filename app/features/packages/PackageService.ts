@@ -47,6 +47,40 @@ class PackageService {
       .first();
   }
 
+  async getPackageAndVersion(scope: string|null, name: string|null): Promise<{pack: Package|null, version: PackageVersion|null}> {
+    if (!scope || !name) {
+      return { pack: null, version: null };
+    }
+
+    const nameParts = name.split('@');
+    let rawVersion = null;
+    if (nameParts.length > 1) {
+      name = nameParts[0];
+      rawVersion = nameParts[1];
+    }
+
+    const pack = await Package.query()
+      .where('name', name)
+      .whereHas('scope', (query) => {
+        query.where('name', scope);
+      })
+      .first();
+
+    if (!pack) {
+      return { pack: null, version: null };
+    }
+
+    let version: PackageVersion|null = null;
+    if (rawVersion) {
+      version = await pack.getVersionOrFail(rawVersion);
+    } else {
+      await pack.load('latestStableVersion');
+      version = pack.latestStableVersion;
+    }
+
+    return { pack, version };
+  }
+
   async getLatestStableVersion(targetPackage: Package): Promise<PackageVersion|null> {
     const versions = await targetPackage.versionMap();
     const stableVersions = Array.from(versions.keys()).filter((v) => !v.prerelease.length);
