@@ -2,6 +2,8 @@ import Package from "./Package.js";
 import Scope from "../scopes/Scope.js";
 import { createPackageValidator } from "./validators.js";
 import logger from "@adonisjs/core/services/logger";
+import PackageVersion from "./PackageVersion.js";
+import semver, { SemVer } from "semver";
 
 class PackageService {
   async createPackage(scope: Scope, packageName: string): Promise<Package> {
@@ -31,6 +33,23 @@ class PackageService {
         query.where('name', scope);
       })
       .first();
+  }
+
+  async getLatestStableVersion(targetPackage: Package): Promise<PackageVersion|null> {
+    const versions = await targetPackage.versionMap();
+    const stableVersions = Array.from(versions.keys()).filter((v) => !v.prerelease.length);
+    if (stableVersions.length === 0) {
+      return null;
+    }
+
+    const latestStableVersion = stableVersions.toSorted(semver.rcompare);
+    return versions.get(latestStableVersion.shift()!)!;
+  }
+
+  async getLatestVersion(targetPackage: Package): Promise<PackageVersion|null> {
+    const versions = await targetPackage.versionMap();
+    const latestVersion = Array.from(versions.keys()).toSorted(semver.rcompare);
+    return versions.get(latestVersion.shift()!)!;
   }
 }
 

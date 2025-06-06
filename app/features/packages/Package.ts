@@ -1,8 +1,10 @@
 import { DateTime } from 'luxon'
-import { afterCreate, BaseModel, beforeFetch, beforeFind, belongsTo, column, computed } from '@adonisjs/lucid/orm'
+import { afterCreate, BaseModel, beforeFetch, beforeFind, belongsTo, column, computed, hasMany } from '@adonisjs/lucid/orm'
 import Scope from '../scopes/Scope.js'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import type { BelongsTo, ExtractModelRelations, HasMany } from '@adonisjs/lucid/types/relations'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+import PackageVersion from './PackageVersion.js'
+import { SemVer } from 'semver'
 
 export default class Package extends BaseModel {
   static table = 'package'
@@ -33,6 +35,11 @@ export default class Package extends BaseModel {
   })
   declare scope: BelongsTo<typeof Scope>
 
+  @hasMany(() => PackageVersion, {
+    foreignKey: 'packageId',
+  })
+  declare versions: HasMany<typeof PackageVersion>
+
   @computed()
   get reference() {
     return `@${this.fullName}`;
@@ -41,6 +48,15 @@ export default class Package extends BaseModel {
   @computed()
   get fullName() {
     return `${this.scope.name}/${this.name}`;
+  }
+
+  async versionMap(): Promise<Map<SemVer, PackageVersion>> {
+    await (this as Package).loadOnce('versions');
+    const versionMap = new Map<SemVer, PackageVersion>();
+    for (const version of this.versions) {
+      versionMap.set(version.semver, version);
+    }
+    return versionMap;
   }
 
   @afterCreate()
