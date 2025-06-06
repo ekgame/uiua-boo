@@ -68,11 +68,11 @@ export default class Package extends BaseModel {
     return versionMap;
   }
 
-  async getVersionOrFail(version: string): Promise<PackageVersion> {
-    return PackageVersion.query()
+  async getVersion(version: string): Promise<PackageVersion|null> {
+    return await PackageVersion.query()
       .where('packageId', this.id)
       .where('version', version)
-      .firstOrFail();
+      .first();
   }
 
   @afterCreate()

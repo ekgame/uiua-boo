@@ -71,6 +71,21 @@ router
       router.post('/publish/:jobId/upload', [PublishController, 'apiUploadArchive']).as('package.publish.api.upload');
       router.get('/publish/:jobId', [PublishController, 'apiPublishJobStatus']).as('package.publish.api.status');
     }).use(middleware.auth({guards: ['api']}));
+
+    router
+      .group(() => {
+        router.get('/', [PackageController, 'apiResolvePackage']).as('package.api.resolve');
+      })
+      .prefix('/package/:scope/:name')
+      .where('scope', {
+        match: /^@/,
+        cast: (scope) => scope.replace(/^@/, ''),
+      });
+
+    // Catch-all route for API invalid endpoints
+    router.any('/*' , ({ response }) => {
+      return response.badRequest({ message: 'Invalid API endpoint' });
+    });
   })
   .use(middleware.json())
   .prefix('/api')

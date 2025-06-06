@@ -1,8 +1,7 @@
-import Package from "./Package.js";
 import PackagePolicy from "./PackagePolicy.js";
-import PackageService from "./PackageService.js";
-import { errors, HttpContext } from "@adonisjs/core/http";
-import PackageVersion from "./PackageVersion.js";
+import { HttpContext } from "@adonisjs/core/http";
+import { PackageResolver } from "./PackageResolver.js";
+import { makeAbsoluteUrl } from "../../utils/url.js";
 
 export default class PackageController {
   async packages({ view }: HttpContext) {
@@ -10,7 +9,10 @@ export default class PackageController {
   }
 
   async show({ view, params }: HttpContext) {
-    const { pack, version } = await this.getPackageOrFail(params);
+    const { pack, version } = await this.packageResolverFromParams(params)
+      .defaultToStableVersion()
+      .expectExactVersion()
+      .resolveOrFail();
 
     return view.render('pages/package/show', {
       pack,
@@ -19,7 +21,9 @@ export default class PackageController {
   }
 
   async init({ response, view, params, bouncer }: HttpContext) {
-    const { pack } = await this.getPackageOrFail(params);
+    const { pack } = await this.packageResolverFromParams(params)
+      .defaultToStableVersion()
+      .resolveOrFail();
 
     if (await bouncer.with(PackagePolicy).denies('init', pack)) {
       return response.redirect().toRoute('package.show', {
@@ -33,19 +37,29 @@ export default class PackageController {
     });
   }
 
-  private async getPackageOrFail(params: Record<string, any>): Promise<{ pack: Package, version: PackageVersion|null }> {
-    const { pack, version } = await PackageService.getPackageAndVersion(
-      params.scope || null,
-      params.name || null,
-    );
+  async apiResolvePackage({ params, response }: HttpContext) {
+    const { pack, version } = await this.packageResolverFromParams(params)
+      .defaultToStableVersion()
+      .expectVersion()
+      .resolveOrFail();
 
-    if (!pack) {
-      throw new errors.E_HTTP_EXCEPTION(
-        `Package @${params.scope}/${params.name} not found`,
-        { status: 404 },
-      );
+    return response.ok({
+      reference: pack.reference,
+      version: version!.version,
+      info_url: makeAbsoluteUrl('package.show', {
+        scope: pack.scope.reference,
+        name: `${pack.name}@${version!.version}`,
+      }),
+    });
+  }
+
+  private packageResolverFromParams(params: Record<string, any>): PackageResolver {
+    let name = params.name;
+
+    if (name) {
+      name = decodeURIComponent(name);
     }
 
-    return { pack, version };
+    return PackageResolver.fromScopeAndNameWithOptionalVersion(params.scope || null, name);
   }
 }

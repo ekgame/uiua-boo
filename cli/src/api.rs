@@ -101,6 +101,13 @@ pub enum PackagePublishJobStatus {
     Failed,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ResolvedPackage {
+    pub reference: String,
+    pub version: String,
+    pub info_url: String,
+}
+
 impl BooApiClient {
     pub fn new() -> Self {
         let base_url = std::env::var("BOO_API_URL").unwrap_or_else(|_| DEFAULT_API_URL.to_string());
@@ -260,6 +267,20 @@ impl BooApiClient {
             )
             .send()
             .await;
+        Self::parse_response(response_result).await
+    }
+
+    pub async fn resolve_package(
+        &self,
+        package_reference: &str,
+    ) -> Result<ResolvedPackage, ApiRequestError> {
+        let url = format!(
+            "{}package/{}",
+            self.base_url,
+            package_reference
+        );
+
+        let response_result = self.client.get(&url).send().await;
         Self::parse_response(response_result).await
     }
 }

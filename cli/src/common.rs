@@ -15,4 +15,8 @@ impl BooPackageDefinition {
         
         format!("{}-{}", clean_name, self.version)
     }
+
+    pub fn version_reference(&self) -> String {
+        format!("{}@{}", self.name, self.version)
+    }
 }

@@ -12,13 +12,10 @@ use std::{
 use owo_colors::OwoColorize;
 
 use crate::{
-    PublishArgs,
     api::{
         ApiRequestError, AuthRequest, AuthRequestResponse, AuthRequestStatus, BooApiClient,
-        CreatePublishJobRequest, PackagePublishJobStatus, PublishJobResult,
-    },
-    common::BooPackageDefinition,
-    print_error, print_success, print_warning,
+        CreatePublishJobRequest, PackagePublishJobStatus, PublishJobResult, ResolvedPackage,
+    }, common::BooPackageDefinition, print_error, print_success, print_warning, PublishArgs
 };
 
 use flate2::Compression;
@@ -189,8 +186,12 @@ pub(crate) fn run_publish(args: PublishArgs) {
     });
 
     match status {
-        Ok(_) => {
+        Ok(resolved_package) => {
             print_success("Package published successfully.");
+            println!("");
+            println!("The package is now available here:");
+            println!("- {}", resolved_package.info_url.underline());
+            println!("");
         }
         Err(PublishingError::AppRequestDenied) => {
             print_error("App request was denied, stopping.");
@@ -282,7 +283,7 @@ fn create_package(files: &[PathBuf]) -> Result<Vec<u8>, String> {
     Ok(buffer)
 }
 
-fn do_publish(package: VerifiedPackage) -> Result<(), PublishingError> {
+fn do_publish(package: VerifiedPackage) -> Result<ResolvedPackage, PublishingError> {
     let mut client = BooApiClient::new();
 
     let rt = tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime");
@@ -319,7 +320,7 @@ fn do_publish(package: VerifiedPackage) -> Result<(), PublishingError> {
         print_success("Creating publishing job...");
         let publish_job = client
             .create_publishing_job(CreatePublishJobRequest {
-                name: package.package.name,
+                name: package.package.name.clone(),
                 version: package.package.version.clone(),
             })
             .await
@@ -335,7 +336,12 @@ fn do_publish(package: VerifiedPackage) -> Result<(), PublishingError> {
 
         run_check_publish_job_status_loop(&client, publish_job.publishing_id).await?;
 
-        Ok(())
+        let resolved_package = client
+            .resolve_package(package.package.version_reference().as_str())
+            .await
+            .map_err(|e| PublishingError::from(&e))?;
+
+        Ok(resolved_package)
     })
 }
 
